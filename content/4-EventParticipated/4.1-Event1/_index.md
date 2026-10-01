@@ -148,3 +148,5 @@ Attending the session on **29/09/2026** made it clear that enterprise AI is no l
 
 #### Event photos
 
+![Attending the AWS event on 29/09/2026](event-29-09-photo.jpg)
+
