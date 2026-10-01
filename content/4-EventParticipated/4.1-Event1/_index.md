@@ -147,6 +147,4 @@ Attending the session on **29/09/2026** made it clear that enterprise AI is no l
 - For students and early-career engineers: learn spec-driven habits early; do not rely on vibe coding alone
 
 #### Event photos
-*Add event photos here (State of AI Adoption, Amazon Quick, Extending Quick’s Capabilities, and Kiro slides).*
 
-> Overall, the 29/09/2026 session was not only a product briefing. It framed a practical question for Vietnamese enterprises: how to raise employee productivity with AI while still monitoring, controlling, and standardizing how AI is used.
