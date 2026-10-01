@@ -147,6 +147,5 @@ Tham dự sự kiện ngày **29/09/2026** giúp tôi thấy AI trong doanh nghi
 - Với người học / mới đi làm: nên tập spec-driven sớm, đừng chỉ vibe coding
 
 #### Một số hình ảnh khi tham gia sự kiện
-*Thêm các hình ảnh tại sự kiện vào đây (slide State of AI Adoption, Amazon Quick, Extending Quick, Kiro).*
 
-> Tổng thể, buổi thuyết trình ngày 29/09/2026 không chỉ giới thiệu sản phẩm AWS mà còn làm rõ bài toán quản trị AI trong doanh nghiệp Việt Nam: làm sao tăng năng suất nhân viên mà vẫn monitor, control và standardize được việc dùng AI.
+![Tham dự sự kiện AWS ngày 29/09/2026](event-29-09-photo.jpg)
