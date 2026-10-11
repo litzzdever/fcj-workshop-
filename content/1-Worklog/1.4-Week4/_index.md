@@ -1,57 +1,42 @@
 ---
 title: "Week 4 Worklog"
-date: 2024-01-01
-weight: 1
+date: 2026-10-07
+weight: 4
 chapter: false
 pre: " <b> 1.4. </b> "
 ---
-{{% notice warning %}} 
-⚠️ **Note:** The following information is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
-
 
 ### Week 4 Objectives:
 
-* Connect and get acquainted with members of First Cloud AI Journey.
-* Understand basic AWS services, how to use the console & CLI.
+* Learn Amazon DynamoDB as a fully managed NoSQL service: core components, primary key, secondary indexes, read consistency, and capacity modes.
+* Configure the AWS CLI on a local Windows machine and use least-privilege credentials instead of the root user.
+* Practice the DynamoDB data lifecycle with boto3: create a table, write, read, update, delete, batch load, Query, Scan, and delete the table.
+* Handle new-account verification blocks on CloudFront, Bedrock, and CloudShell through AWS Support.
+* Build a scheduled EC2 stop/start flow with Lambda, EventBridge, and a Slack webhook to reduce idle instance cost.
+* Complete Secrets Manager with RDS and Fargate, the CloudWatch workshop, and a serverless DynamoDB document API with Lambda.
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCAJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
 
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | --- | --- | --- | --- |
+| Wed | - Studied DynamoDB core components: Table, Item, Attribute, partition key, sort key, GSI and LSI, scalar/set/document types <br> - Compared eventually consistent, strongly consistent, and transactional reads; On-demand versus Provisioned capacity <br> - Reviewed backup, PITR for 35 days, TTL, encryption at rest, and 2026 features such as vector search and global tables <br> - CloudShell failed with account verification in progress; same class of block as CloudFront and Bedrock. Opened a support case and used local AWS CLI instead <br> - Configured AWS CLI v2 on Windows with Python 3.13 and boto3, region `us-east-1` <br> - Created table `Movies` (`year` number, `title` string, `PAY_PER_REQUEST`); put, get, update, and delete an item; loaded 4 sample movies with `Decimal`; Query by year and Scan by rating; deleted the table | 10/07/2026 | 10/07/2026 | <https://000060.awsstudygroup.com/1-introduce/1.1-corecomponentsofamazondynamodb/> <br> <https://000060.awsstudygroup.com/3-gettingstartedwithawssdk/> |
+| Thu | - Read the EC2 cost lab: Lambda plus EventBridge stops and starts tagged instances, then posts status to Slack <br> - Created a VPC, security group, and instance `lambda-lab-instance`; tagged it `environment_auto=true` <br> - Created role `dc-common-lambda-role` with least privilege for describe, stop, start, and logs <br> - Wrote `dc-common-lambda-auto-stop` and the start function on Python 3.14, x86_64; EventBridge schedule rules call them <br> - Tested stop and start in the EC2 console and received the Slack messages; stored the webhook URL outside the shared code <br> - Cleaned up EventBridge rules, Lambda functions, the role, the instance, the security group, and the VPC | 10/08/2026 | 10/08/2026 | <https://000022.awsstudygroup.com/1-introduce/> |
+| Fri | - Completed the level 300 lab: Secrets Manager with Amazon RDS and AWS Fargate. Passwords stay out of code and environment variables <br> - Lab network: VPC with 2 subnets, Amazon Linux 2 bastion, private RDS, credentials in Secrets Manager <br> - Accessed RDS through the secret, then ran secret rotation and checked it with shell scripts <br> - Built the app image, pushed it to ECR, and ran it on ECS Fargate so the container reads the secret and connects to private RDS <br> - Mapped the lab to CSF Prevention and CAF Preventative controls | 10/09/2026 | 10/09/2026 | <https://000096.awsstudygroup.com/> |
+| Sat | - Completed the CloudWatch workshop: one place for metrics, logs, alarms, and dashboards <br> - Created CloudFormation stack `AwsWorkshopStack` from `template.yml` <br> - Reviewed metrics and dimensions, then log-based metric `/var/log/messages - ERROR` <br> - Created an alarm, period 1 minute, threshold Greater than 10, with an SNS email topic <br> - Added the alarm to a dashboard and cleaned up the stack, alarm, topic, and dashboard | 10/10/2026 | 10/10/2026 | <https://000036.awsstudygroup.com/1-introduce/> |
+| Sun | - Completed the serverless document lab: Lambda reads and writes DynamoDB <br> - Created table `Documents`, partition key `user_id`, sort key `file`, on-demand capacity <br> - Created `list_documents`, `upload_document`, and `delete_document` <br> - Loaded sample data with `aws dynamodb batch-write-item` and `documentData.json` <br> - Tested list for user `abcd1234`, upload of `aws_serverless.doc`, and delete; each returned succeeded and the table matched <br> - Reviewed the wider DMS path: Amplify, Cognito, S3, DynamoDB, OpenSearch, CloudFront, X-Ray, CloudWatch; cleaned up the table and functions | 10/11/2026 | 10/11/2026 | <https://000133.awsstudygroup.com/> |
 
 ### Week 4 Achievements:
 
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Can explain DynamoDB core pieces and the difference between Query and Scan, and between On-demand and Provisioned capacity.
 
-* Successfully created and configured an AWS Free Tier account.
+* Configured AWS CLI on Windows and completed the Movies table lifecycle in boto3, including `Decimal` for numbers.
 
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
+* Replaced blocked CloudShell with local CLI, and grouped CloudFront, Bedrock, and CloudShell verification into one support case.
 
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
+* Built and tested a tagged EC2 stop/start schedule with Lambda, EventBridge, and Slack, then removed the lab resources.
 
-* Used AWS CLI to perform basic operations such as:
+* Used Secrets Manager for RDS credentials, including rotation, and connected a Fargate task to a private database.
 
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
+* Created a CloudWatch alarm from a log metric and placed it on a dashboard.
 
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+* Exposed DynamoDB through three Lambda functions for list, upload, and delete, with passing test events.
