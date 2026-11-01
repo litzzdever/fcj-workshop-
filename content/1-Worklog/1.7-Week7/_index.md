@@ -1,42 +1,42 @@
 ---
-title: "Worklog Tuần 7"
+title: "Week 7 Worklog"
 date: 2026-10-27
 weight: 7
 chapter: false
 pre: " <b> 1.7. </b> "
 ---
 
-### Mục tiêu tuần 7:
+### Week 7 Objectives:
 
-* Tìm hiểu AWS AppSync và cách xây dựng GraphQL API kết nối với Amazon DynamoDB.
-* Thực hành các tutorial chính thức: mutation, query, blank API, subscription, merged APIs.
-* Hoàn thành tutorial Post application với JavaScript resolvers (CRUD, vote, tags).
-* Thực hành Lambda resolvers, local resolvers, combining resolvers và DynamoDB transactions.
-* Tìm hiểu VTL resolver tutorials và Configuration & Settings của AppSync.
-* Nắm vững Authorization & Authentication để bảo mật GraphQL API (API Key, Lambda, IAM, OpenID Connect, Cognito User Pools).
+* Learn AWS AppSync and how to build GraphQL APIs connected to Amazon DynamoDB.
+* Practice official tutorials: mutations, queries, blank APIs, subscriptions, and merged APIs.
+* Complete the Post application tutorial with JavaScript resolvers (CRUD, vote, tags).
+* Practice Lambda resolvers, local resolvers, combining resolvers, and DynamoDB transactions.
+* Study VTL resolver tutorials and AppSync Configuration & Settings.
+* Master Authorization & Authentication to secure GraphQL APIs (API Key, Lambda, IAM, OpenID Connect, Cognito User Pools).
 
-### Các công việc cần triển khai trong tuần này:
+### Tasks to be carried out this week:
 
-| Thứ | Công việc | Ngày bắt đầu | Ngày hoàn thành | Nguồn tài liệu |
+| Day | Task | Start Date | Completion Date | Reference Material |
 | --- | --- | --- | --- | --- |
-| 3 | - Thực hành mutation `createTodo` và query `getTodo` / `listTodos` trên Todo API mẫu <br> - Tạo blank API `MyBlankAPI`, viết schema, tạo bảng DynamoDB, gắn data source và JavaScript unit resolver cho `addObj` / `getObj` <br> - Thêm Subscription `onAddObj` với `@aws_subscribe`, kiểm thử realtime qua WebSocket <br> - Tạo Merged API kết hợp Todo API và MyBlankAPI <br> - Hoàn thành tutorial Post application: `addPost`, `getPost`, `updatePost`, `vote`, `deletePost`, `allPost`, `allPostsByAuthor`, `addTag` / `removeTag`, `allPostsByTag` <br> - Clean up các API và bảng DynamoDB không còn dùng | 27/10/2026 | 27/10/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html> |
-| 4 | - Tạo Lambda function (Node.js 22.x) và API `LambdaTutorialAPI`; gắn Lambda data source, viết resolver `Invoke` cho `getPost`, `allPosts`, `addPost` <br> - Tạo API `LocalResolverAPI` với data source None, local resolver cho `publish`, kiểm thử subscription pub/sub <br> - Nghiên cứu Combining GraphQL resolvers: kết hợp DynamoDB, Lambda, OpenSearch trên cùng schema <br> - Thực hành DynamoDB Transactions: tạo 3 bảng `savingAccounts`, `checkingAccounts`, `transactionHistory`; viết `TransactWriteItems` cho `populateAccounts` và `transferMoney`, `TransactGetItems` cho `getAccounts` | 28/10/2026 | 28/10/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/tutorials-js.html> |
-| 5 | - Tìm hiểu VTL resolver tutorials: post application, Lambda, OpenSearch, local, combining, batch, transactions, HTTP, Aurora Serverless, pipeline, Delta Sync <br> - So sánh VTL mapping templates với JavaScript resolvers (APPSYNC_JS); ghi nhận AWS ưu tiên JavaScript runtime cho dự án mới | 29/10/2026 | 29/10/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/tutorials.html> |
-| 6 | - Tìm hiểu Configuration and Settings: Caching, Versioning GraphQL objects, Custom domain names, Private APIs (VPC), Sharing APIs qua AWS RAM <br> - Introspection và limits (query depth, resolver count), Environment variables, Logging (CloudTrail), Monitoring (CloudWatch), Tracing (X-Ray) | 30/10/2026 | 30/10/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/configuration-and-settings.html> |
-| 7 | - Hoàn thành Configuring authorization and authentication <br> - Nắm 5 authorization types: API_KEY, AWS_LAMBDA, AWS_IAM, OPENID_CONNECT, AMAZON_COGNITO_USER_POOLS <br> - Multiple authorization modes, fine-grained access control qua identity context trong resolver, filtering theo owner/role, data source access theo least privilege <br> - Kết nối với Cognito User Pools đã học ở tuần 5 | 31/10/2026 | 31/10/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html> |
+| Tue | - Practiced `createTodo` mutation and `getTodo` / `listTodos` queries on the sample Todo API <br> - Created blank API `MyBlankAPI`, wrote schema, created DynamoDB table, attached data source, and wrote JavaScript unit resolvers for `addObj` / `getObj` <br> - Added Subscription `onAddObj` with `@aws_subscribe` and tested realtime over WebSocket <br> - Created a Merged API combining Todo API and MyBlankAPI <br> - Completed the Post application tutorial: `addPost`, `getPost`, `updatePost`, `vote`, `deletePost`, `allPost`, `allPostsByAuthor`, `addTag` / `removeTag`, `allPostsByTag` <br> - Cleaned up unused APIs and DynamoDB tables | 10/27/2026 | 10/27/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html> |
+| Wed | - Created a Lambda function (Node.js 22.x) and API `LambdaTutorialAPI`; attached Lambda data source and wrote `Invoke` resolvers for `getPost`, `allPosts`, `addPost` <br> - Created API `LocalResolverAPI` with a None data source and local resolver for `publish`; tested pub/sub subscription <br> - Studied Combining GraphQL resolvers: mixing DynamoDB, Lambda, and OpenSearch on the same schema <br> - Practiced DynamoDB Transactions: created three tables `savingAccounts`, `checkingAccounts`, `transactionHistory`; wrote `TransactWriteItems` for `populateAccounts` and `transferMoney`, and `TransactGetItems` for `getAccounts` | 10/28/2026 | 10/28/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/tutorials-js.html> |
+| Thu | - Studied VTL resolver tutorials: post application, Lambda, OpenSearch, local, combining, batch, transactions, HTTP, Aurora Serverless, pipeline, Delta Sync <br> - Compared VTL mapping templates with JavaScript resolvers (APPSYNC_JS); noted that AWS recommends the JavaScript runtime for new projects | 10/29/2026 | 10/29/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/tutorials.html> |
+| Fri | - Studied Configuration and Settings: Caching, Versioning GraphQL objects, Custom domain names, Private APIs (VPC), Sharing APIs via AWS RAM <br> - Introspection and limits (query depth, resolver count), Environment variables, Logging (CloudTrail), Monitoring (CloudWatch), Tracing (X-Ray) | 10/30/2026 | 10/30/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/configuration-and-settings.html> |
+| Sat | - Completed Configuring authorization and authentication <br> - Covered five authorization types: API_KEY, AWS_LAMBDA, AWS_IAM, OPENID_CONNECT, AMAZON_COGNITO_USER_POOLS <br> - Multiple authorization modes, fine-grained access control via identity context in resolvers, owner/role-based filtering, and least-privilege data source access <br> - Linked back to Cognito User Pools from week 5 | 10/31/2026 | 10/31/2026 | <https://docs.aws.amazon.com/appsync/latest/devguide/security-authz.html> |
 
-### Kết quả đạt được tuần 7:
+### Week 7 Achievements:
 
-* Hiểu kiến trúc AWS AppSync: Schema, Data Source, Resolver và cách phối hợp với DynamoDB.
+* Understood AWS AppSync architecture: Schema, Data Source, Resolver, and how they work with DynamoDB.
 
-* Thành thạo CRUD qua GraphQL mutation/query; viết JavaScript unit resolvers cho PutItem, GetItem, UpdateItem, DeleteItem, Scan, Query.
+* Mastered CRUD through GraphQL mutations/queries; wrote JavaScript unit resolvers for PutItem, GetItem, UpdateItem, DeleteItem, Scan, and Query.
 
-* Thực hành Subscription realtime với `@aws_subscribe` và local resolvers (None data source) cho pub/sub.
+* Practiced realtime Subscriptions with `@aws_subscribe` and local resolvers (None data source) for pub/sub.
 
-* Tạo Merged API; hoàn thành Post application với vote, tags (DynamoDB String Set) và query theo GSI.
+* Created a Merged API; completed the Post application with vote, tags (DynamoDB String Set), and GSI-based queries.
 
-* Triển khai Lambda resolvers và DynamoDB Transactions (`TransactWriteItems`, `TransactGetItems`) trên nhiều bảng.
+* Implemented Lambda resolvers and DynamoDB Transactions (`TransactWriteItems`, `TransactGetItems`) across multiple tables.
 
-* Tìm hiểu VTL tutorials, Configuration & Settings (caching, private API, monitoring) và năm loại authorization để bảo mật GraphQL API.
+* Studied VTL tutorials, Configuration & Settings (caching, private API, monitoring), and the five authorization types for securing GraphQL APIs.
 
-* Kết nối kiến thức với DynamoDB (tuần 4), Cognito (tuần 5) và mở rộng sang GraphQL API layer có bảo mật.
+* Connected knowledge from DynamoDB (week 4) and Cognito (week 5) to a full GraphQL API layer with security.
