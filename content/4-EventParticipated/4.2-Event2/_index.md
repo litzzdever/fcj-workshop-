@@ -142,6 +142,6 @@ Attending the **AWS First Cloud AI Journey** sharing session on 31/10 gave me bo
 
 #### Some event photos
 
-![Tran Minh Tuan presenting "New to AWS? Where should you start?"](/images/4-EventParticipated/4.2-Event2/event-photo.png)
+![Tran Minh Tuan presenting "New to AWS? Where should you start?"](https://raw.githubusercontent.com/litzzdever/fcj-workshop-/main/static/images/4-EventParticipated/4.2-Event2/event-photo.png)
 
 > Overall, the event gave me a practical AWS learning roadmap, a clearer understanding of serverless and asynchronous architecture, and a real picture of how AI agents are changing the way software teams work.

@@ -142,6 +142,6 @@ Tham gia buổi chia sẻ **AWS First Cloud AI Journey** ngày 31/10 giúp tôi 
 
 #### Một số hình ảnh khi tham gia sự kiện
 
-![Anh Tran Minh Tuan trình bày "New to AWS? Where should you start?"](/images/4-EventParticipated/4.2-Event2/event-photo.png)
+![Anh Tran Minh Tuan trình bày "New to AWS? Where should you start?"](https://raw.githubusercontent.com/litzzdever/fcj-workshop-/main/static/images/4-EventParticipated/4.2-Event2/event-photo.png)
 
 > Tổng thể, sự kiện mang lại cho tôi một lộ trình học AWS thực tế, hiểu rõ hơn về kiến trúc serverless và bất đồng bộ, cùng một bức tranh thực tế về cách AI agent đang thay đổi cách các đội phát triển phần mềm làm việc.
