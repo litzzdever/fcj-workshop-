@@ -1,125 +1,147 @@
 ---
 title: "Event 2"
-date: 2024-01-01
-weight: 1
+date: 2026-10-31
+weight: 2
 chapter: false
 pre: " <b> 4.2. </b> "
 ---
 
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
-
-# Bài thu hoạch “GenAI-powered App-DB Modernization workshop”
+# Bài thu hoạch “AWS First Cloud AI Journey – Community Sharing Session (31/10/2026)”
 
 ### Mục Đích Của Sự Kiện
 
-- Chia sẻ best practices trong thiết kế ứng dụng hiện đại
-- Giới thiệu phương pháp DDD và event-driven architecture
-- Hướng dẫn lựa chọn compute services phù hợp
-- Giới thiệu công cụ AI hỗ trợ development lifecycle
+- Chia sẻ bài học thực tế khi xây dựng "software factory" với AI agent ở quy mô lớn
+- Định hướng lộ trình bắt đầu học AWS rõ ràng cho sinh viên
+- Giới thiệu AWS Lambda Web Functions và mô hình tính phí Active CPU Billing
+- Trình bày cách thiết kế hệ thống bất đồng bộ với Amazon SQS
+- Chia sẻ trải nghiệm thực tập 3 tháng tại FCAJ
+- Khuyến khích sinh viên bắt đầu và duy trì đóng góp mã nguồn mở
 
 ### Danh Sách Diễn Giả
 
-- **Jignesh Shah** - Director, Open Source Databases
-- **Erica Liu** - Sr. GTM Specialist, AppMod
-- **Fabrianne Effendi** - Assc. Specialist SA, Serverless Amazon Web Services
+- **Henry (Duc) Bui** – Head of Engineering, CloudThinker
+- **Tran Minh Tuan** – Backend Developer, FPT University
+- **Thinh Nguyen** – DevSecOps/Cloud Engineer, Styl Solutions – First Cloud AI Journey
+- **Khang Duong** – Thành viên FCAJ
+
+### Chương Trình
+
+| Thời gian | Phiên chia sẻ |
+|---|---|
+| 9:00 – 9:25 | Lessons Learned from Building Software Factories |
+| 9:30 – 9:55 | Education – New to AWS? Where Should You Start? |
+| 10:00 – 10:25 | AWS Lambda Web Functions: Rethinking Serverless Web Architecture |
+| 10:30 – 11:00 | Amazon SQS: Building Asynchronous Systems |
+| 11:00 – 11:25 | My 3-Month AWS Internship Journey |
+| 11:30 – 12:00 | Start & Maintain Consistency with Open Source Contributing |
 
 ### Nội Dung Nổi Bật
 
-#### Đưa ra các ảnh hưởng tiêu cực của kiến trúc ứng dụng cũ
+#### Bài học từ việc xây dựng Software Factories
 
-- Thời gian release sản phẩm lâu → Mất doanh thu/bỏ lỡ cơ hội
-- Hoạt động kém hiệu quả → Mất năng suất, tốn kém chi phí
-- Không tuân thủ các quy định về bảo mật → Mất an ninh, uy tín
+- **Quy mô thực tế**: Số lần merge vào nhánh `develop` tăng từ **39 lần/tháng (12/2024)** lên **2.901 lần/tháng (10/2026)** khi AI agent trở thành một phần của quy trình phát triển
+- **Một thư mục điều khiển tất cả**: Mọi phiên làm việc của agent đều bắt đầu từ một **thư mục control** chứa ghi chú, skill và hướng dẫn máy; từ đó agent truy cập repo app, infra, docs trên laptop cũng như máy của team và cụm dev/prod trên cloud
+- **Mỗi merge request đều có bằng chứng**: Agent tự chụp lại thay đổi — trước/sau, chế độ sáng/tối, màn hình rộng/hẹp — để người review thấy kết quả **mà không cần chạy gì**
+- **Nhiều phiên, một test cache dùng chung**:
+  - Kết quả test được lưu theo **test + hash của các file mà test sử dụng** → code không đổi thì dùng lại kết quả, code thay đổi thì chạy một lần và lưu cho tất cả
+  - **Chạy lại ngẫu nhiên 2%** kết quả đã cache để kiểm chứng độ tin cậy
+  - **Shared check runner** giữ sẵn 10 bản sao của ứng dụng; 65 bước kiểm tra (type check, lint, migration, quét secret, audit dependency, test) được chọn theo phần code thay đổi
+  - Kết quả: **thời gian chờ kiểm tra giảm 76%**
 
-#### Chuyển đổi sang kiến trúc ứng dụng mới - Microservice Architecture
+#### Education – Mới học AWS? Nên bắt đầu từ đâu?
 
-Chuyển đổi thành hệ thống modular – từng chức năng là một **dịch vụ độc lập** giao tiếp với nhau qua **sự kiện** với 3 trụ cột cốt lõi:
+- **3 website, 3 mục đích bổ trợ nhau** — không website nào đáp ứng mọi nhu cầu học:
+  - **AWS Study Group** (cloudjourney.awsfcaj.com) – thực hành theo workshop từng bước, hướng dẫn bằng tiếng Việt
+  - **AWS Skill Builder** (skillbuilder.aws) – khóa học online, ôn thi chứng chỉ, lab và tài liệu theo chủ đề
+  - **AWS Builder Center** (builder.aws.com) – bài viết, workshop, xác minh sinh viên và nhận huy hiệu
+- **Lộ trình học gợi ý**: Nền tảng (Cloud, Region/AZ, IAM, bảo mật) → Thực hành (lab IAM, S3, AWS Budgets) → Ghi chép (khái niệm, lỗi, cách khắc phục) → Kết nối (cộng đồng, huy hiệu, Student Rewards)
+- **Credit AWS Free Tier**: 100 USD khi đăng ký + tối đa 100 USD từ các nhiệm vụ khám phá = **tối đa 200 USD** — nhưng credit **không thay thế cảnh báo Budgets** hay việc đọc kỹ điều khoản
+- **Gói Skill Builder** mở khóa **AWS Cloud Quest** (học AWS qua game 3D) và **AWS Builder Labs** (lab có hướng dẫn từng bước); một số nội dung miễn phí, nội dung nâng cao tùy theo gói
+- Thu hẹp khoảng cách giữa nhà trường và doanh nghiệp: sinh viên cần chuẩn bị gì trước khi đi làm
 
-- **Queue Management**: Xử lý tác vụ bất đồng bộ
-- **Caching Strategy:** Tối ưu performance
-- **Message Handling:** Giao tiếp linh hoạt giữa services
+#### AWS Lambda Web Functions: Tư duy lại kiến trúc web Serverless
 
-#### Domain-Driven Design (DDD)
+- **Hỗ trợ HTTP gốc**: Lambda xử lý request web trực tiếp, bỏ lớp adapter trước đây cần có để chạy web framework
+- **Đa luồng đồng thời**: Tối đa **128 request đồng thời** trên một môi trường thực thi thay vì một request mỗi instance
+- **Active CPU Billing**:
+  - *Mô hình cũ* – tính phí theo tổng thời gian chạy; thời gian chờ database vẫn bị tính đủ giá
+  - *Mô hình mới* – chỉ tính phí theo chu kỳ CPU thực sự xử lý; thời gian chờ I/O database có chi phí CPU là 0 USD
+  - **Giảm 40–70% chi phí compute** với các backend web và microservice thiên về I/O
+- Benchmark trực tiếp so sánh Serverless với **Docker trên EC2/ECS**
 
-- **Phương pháp 4 bước**: Xác định domain events → sắp xếp timeline → identify actors → xác định bounded contexts
-- **Case study bookstore**: Minh họa cách áp dụng DDD thực tế
-- **Context mapping**: 7 patterns tích hợp bounded contexts
+#### Amazon SQS: Xây dựng hệ thống bất đồng bộ
 
-#### Event-Driven Architecture
+- Vì sao hệ thống hiện đại cần **xử lý bất đồng bộ** thay vì gọi đồng bộ nối tiếp
+- Dùng **Amazon SQS** làm hàng đợi trung gian để **tách rời (decouple)** bên gửi và bên xử lý, mở rộng từng bên độc lập
+- Các design pattern và mẹo triển khai thực tế cho kiến trúc dựa trên hàng đợi
 
-- **3 patterns tích hợp**: Publish/Subscribe, Point-to-point, Streaming
-- **Lợi ích**: Loose coupling, scalability, resilience
-- **So sánh sync vs async**: Hiểu rõ trade-offs (sự đánh đổi)
+#### Hành trình thực tập 3 tháng tại FCAJ
 
-#### Compute Evolution
+- Xây dựng **game bài serverless trên AWS** làm dự án thực tập
+- Áp dụng các dịch vụ AWS vào sản phẩm thật, không chỉ dừng ở lab
+- Bài học và lời khuyên cho các bạn sắp bắt đầu thực tập
 
-- **Shared Responsibility Model**: Từ EC2 → ECS → Fargate → Lambda
-- **Serverless benefits**: No server management, auto-scaling, pay-for-value
-- **Functions vs Containers**: Criteria lựa chọn phù hợp
+#### Bắt đầu và duy trì đóng góp mã nguồn mở
 
-#### Amazon Q Developer
-
-- **SDLC automation**: Từ planning đến maintenance
-- **Code transformation**: Java upgrade, .NET modernization
-- **AWS Transform agents**: VMware, Mainframe, .NET migration
+- Cách thực hiện **đóng góp open source đầu tiên** từ con số 0
+- Xây dựng thói quen đóng góp đều đặn và giữ động lực
+- Tác động của open source đến kỹ năng và sự nghiệp
 
 ### Những Gì Học Được
 
-#### Tư Duy Thiết Kế
+#### Phát triển phần mềm với AI
 
-- **Business-first approach**: Luôn bắt đầu từ business domain, không phải technology
-- **Ubiquitous language**: Importance của common vocabulary giữa business và tech teams
-- **Bounded contexts**: Cách identify và manage complexity trong large systems
+- **Nút thắt là kiểm chứng, không phải sinh code**: khi agent tạo ra hàng nghìn thay đổi, bằng chứng trực quan trên mỗi merge request và hệ thống kiểm tra nhanh, dùng chung mới là thứ giữ được chất lượng
+- **Cache thông minh nhưng vẫn phải kiểm tra lại cache**: hash đầu vào của test giúp tiết kiệm thời gian, còn việc chạy lại ngẫu nhiên giúp kết quả luôn đáng tin
+- **Tập trung ngữ cảnh cho agent**: một thư mục control chứa ghi chú, skill và hướng dẫn giúp các phiên làm việc nhất quán trên nhiều repo và môi trường
 
-#### Kiến Trúc Kỹ Thuật
+#### Kiến trúc Cloud & Chi phí
 
-- **Event storming technique**: Phương pháp thực tế để mô hình hóa quy trình kinh doanh
-- Sử dụng **Event-driven communication** thay vì synchronous calls
-- **Integration patterns**: Hiểu khi nào dùng sync, async, pub/sub, streaming
-- **Compute spectrum**: Criteria chọn từ VM → containers → serverless
+- **Mô hình tính phí ảnh hưởng đến kiến trúc**: với Active CPU Billing, API thiên về I/O chạy trên Lambda rẻ hơn nhiều, làm thay đổi bài toán chọn Lambda hay EC2/ECS
+- **Ưu tiên bất đồng bộ khi có thể**: hàng đợi như SQS hấp thụ lưu lượng tăng đột biến và tránh việc một service chậm làm nghẽn cả hệ thống
 
-#### Chiến Lược Hiện Đại Hóa
+#### Chiến lược học tập
 
-- **Phased approach**: Không rush, phải có roadmap rõ ràng
-- **7Rs framework**: Nhiều con đường khác nhau tùy thuộc vào đặc điểm của mỗi ứng dụng
-- **ROI measurement**: Cost reduction + business agility
+- **Học → thực hành → ghi chép → chia sẻ**: đi theo thứ tự rõ ràng thay vì nhảy lung tung giữa các dịch vụ
+- **An toàn chi phí là trên hết**: thiết lập cảnh báo AWS Budgets trước khi thử nghiệm, kể cả khi có credit miễn phí
+- **Đều đặn quan trọng hơn cường độ**: cả phiên thực tập và phiên open source đều nhấn mạnh tiến bộ nhỏ nhưng đều đặn
 
 ### Ứng Dụng Vào Công Việc
 
-- **Áp dụng DDD** cho project hiện tại: Event storming sessions với business team
-- **Refactor microservices**: Sử dụng bounded contexts để identify service boundaries
-- **Implement event-driven patterns**: Thay thế một số sync calls bằng async messaging
-- **Serverless adoption**: Pilot AWS Lambda cho một số use cases phù hợp
-- **Try Amazon Q Developer**: Integrate vào development workflow để boost productivity
+- **Thiết lập cảnh báo AWS Budgets** cho tài khoản trước khi làm thêm lab
+- **Đi theo lộ trình gợi ý**: hoàn thành phần nền tảng trên Skill Builder, sau đó làm lab IAM, S3 và Budgets trên AWS Study Group
+- **Ghi nhật ký học tập** về khái niệm, lỗi và cách sửa cho mỗi lab
+- **Thử Lambda cho API Node.js**: so sánh chi phí và độ trễ với cấu hình EC2 hiện tại cho một backend thiên về I/O
+- **Đưa SQS vào dự án** để tách các tác vụ chậm (gửi email, thông báo, xử lý file) ra khỏi luồng request
+- **Đính kèm bằng chứng vào pull request**: thêm ảnh trước/sau vào PR của dự án nhóm để người review không phải tự chạy code
+- **Thực hiện đóng góp open source đầu tiên**, bắt đầu từ tài liệu hoặc một issue nhỏ
 
-### Trải nghiệm trong event
+### Trải nghiệm trong sự kiện
 
-Tham gia workshop **“GenAI-powered App-DB Modernization”** là một trải nghiệm rất bổ ích, giúp tôi có cái nhìn toàn diện về cách hiện đại hóa ứng dụng và cơ sở dữ liệu bằng các phương pháp và công cụ hiện đại. Một số trải nghiệm nổi bật:
+Tham gia buổi chia sẻ **AWS First Cloud AI Journey** ngày 31/10 giúp tôi có được một lộ trình học AWS thực tế và cái nhìn về cách các đội ngũ thật đang xây dựng phần mềm hiện nay.
 
-#### Học hỏi từ các diễn giả có chuyên môn cao
-- Các diễn giả đến từ AWS và các tổ chức công nghệ lớn đã chia sẻ **best practices** trong thiết kế ứng dụng hiện đại.
-- Qua các case study thực tế, tôi hiểu rõ hơn cách áp dụng **Domain-Driven Design (DDD)** và **Event-Driven Architecture** vào các project lớn.
+#### Học hỏi từ các diễn giả giàu kinh nghiệm
+- Các diễn giả từ CloudThinker, Styl Solutions, FPT University và cộng đồng FCAJ chia sẻ bài học từ dự án thực tế thay vì chỉ lý thuyết.
+- Phiên **software factories** thực sự mở mang: số merge tăng từ 39 lên 2.901 mỗi tháng cho thấy AI agent có thể thay đổi tốc độ của một team đến mức nào — và cần bao nhiêu công sức kỹ thuật để giữ tốc độ đó an toàn.
 
 #### Trải nghiệm kỹ thuật thực tế
-- Tham gia các phiên trình bày về **event storming** giúp tôi hình dung cách **mô hình hóa quy trình kinh doanh** thành các domain events.
-- Học cách **phân tách microservices** và xác định **bounded contexts** để quản lý sự phức tạp của hệ thống lớn.
-- Hiểu rõ trade-offs giữa **synchronous và asynchronous communication** cũng như các pattern tích hợp như **pub/sub, point-to-point, streaming**.
+- Phiên **Lambda Web Functions** giúp tôi thấy rõ sự khác biệt về chi phí: trả tiền cho CPU thực sự xử lý thay vì tổng thời gian chạy rất có ý nghĩa với các API phần lớn thời gian chỉ chờ database.
+- Phiên **SQS** kết nối tốt với những gì tôi đã biết về tách rời service và xử lý tác vụ bất đồng bộ.
 
-#### Ứng dụng công cụ hiện đại
-- Trực tiếp tìm hiểu về **Amazon Q Developer**, công cụ AI hỗ trợ SDLC từ lập kế hoạch đến maintenance.
-- Học cách **tự động hóa code transformation** và pilot serverless với **AWS Lambda**, từ đó nâng cao năng suất phát triển.
+#### Định hướng rõ ràng cho sinh viên
+- Phiên **Education** đưa ra kế hoạch đơn giản, dễ làm theo: dùng website nào cho mục đích gì, học theo thứ tự nào, và cách nhận tối đa 200 USD credit mà không quên kiểm soát chi phí.
+- Phiên **thực tập** cho thấy một dự án AWS trong 3 tháng có thể trông như thế nào trong thực tế — một game bài serverless được xây dựng hoàn chỉnh.
 
 #### Kết nối và trao đổi
-- Workshop tạo cơ hội trao đổi trực tiếp với các chuyên gia, đồng nghiệp và team business, giúp **nâng cao ngôn ngữ chung (ubiquitous language)** giữa business và tech.
-- Qua các ví dụ thực tế, tôi nhận ra tầm quan trọng của **business-first approach**, luôn bắt đầu từ nhu cầu kinh doanh thay vì chỉ tập trung vào công nghệ.
+- Sự kiện là cơ hội tốt để gặp gỡ các bạn sinh viên và thành viên FCAJ đang cùng trên hành trình học cloud.
 
 #### Bài học rút ra
-- Việc áp dụng DDD và event-driven patterns giúp giảm **coupling**, tăng **scalability** và **resilience** cho hệ thống.
-- Chiến lược hiện đại hóa cần **phased approach** và đo lường **ROI**, không nên vội vàng chuyển đổi toàn bộ hệ thống.
-- Các công cụ AI như Amazon Q Developer có thể **boost productivity** nếu được tích hợp vào workflow phát triển hiện tại.
+- Nhanh mà không kiểm chứng thì rủi ro; công cụ tốt (cache dùng chung, kiểm tra tự động, bằng chứng trực quan) mới giúp việc phát triển nhanh bền vững.
+- Hiểu **mô hình tính phí** là một phần của thiết kế kiến trúc, không phải việc tính sau.
+- Luyện tập đều đặn — dù là lab AWS hay open source — là cách phát triển chắc chắn nhất.
 
 #### Một số hình ảnh khi tham gia sự kiện
-* Thêm các hình ảnh của các bạn tại đây
-> Tổng thể, sự kiện không chỉ cung cấp kiến thức kỹ thuật mà còn giúp tôi thay đổi cách tư duy về thiết kế ứng dụng, hiện đại hóa hệ thống và phối hợp hiệu quả hơn giữa các team.
+
+![Anh Tran Minh Tuan trình bày "New to AWS? Where should you start?"](/images/4-EventParticipated/4.2-Event2/event-photo.png)
+
+> Tổng thể, sự kiện mang lại cho tôi một lộ trình học AWS thực tế, hiểu rõ hơn về kiến trúc serverless và bất đồng bộ, cùng một bức tranh thực tế về cách AI agent đang thay đổi cách các đội phát triển phần mềm làm việc.
