@@ -107,7 +107,7 @@ Trạng thái hiện tại: phiên bản v6 đã chạy trên tài khoản AWS c
 
 ### 6. Bảng dự toán ngân sách và chi phí (Cost Estimation)
 
-**Cách tính.** Dự toán dựa trên bảng giá công bố của AWS và Google, kịch bản tải thực tế và số liệu đo từ chatbot đang chạy. Các đơn giá AWS lấy theo bảng giá của trang giá AWS (vùng US East), cộng 15% dự phòng cho chênh lệch vùng Singapore; con số cuối cùng nên đối chiếu bằng [AWS Pricing Calculator](https://calculator.aws/).
+**Cách tính.** Dự toán dựa trên bảng giá công bố của AWS và Google, kịch bản tải thực tế và số liệu đo từ chatbot đang chạy. Số liệu AWS của kịch bản 10.000 câu hỏi lấy từ [AWS Pricing Calculator](https://calculator.aws/) (vùng Singapore, chưa tính mức miễn phí nên là con số trần); hai kịch bản 1.000 và 100.000 câu được nội suy theo tỷ lệ. Số liệu Gemini là giả định của nhóm theo bảng giá của Google, vì Gemini không thuộc AWS.
 
 **Bản ước tính trên AWS Pricing Calculator (vùng Singapore, kịch bản 10.000 câu hỏi/tháng):** [https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f](https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f)
 
@@ -137,24 +137,24 @@ Trạng thái hiện tại: phiên bản v6 đã chạy trên tài khoản AWS c
 
 | Hạng mục | Demo: 1.000 câu | Thử nghiệm: 10.000 câu | Mở rộng: 100.000 câu |
 |---|---|---|---|
-| Lambda (trong mức miễn phí) | 0,00 | 0,00 | 0,00 |
-| API Gateway WebSocket | 0,00 | 0,02 | 0,23 |
-| DynamoDB | 0,00 | 0,04 | 0,39 |
+| Lambda (giá đầy đủ, không tính miễn phí) | 0,04 | 0,42 | 4,21 |
+| API Gateway WebSocket | 0,00 | 0,02 | 0,20 |
+| DynamoDB theo yêu cầu | 0,03 | 0,07 | 0,43 |
 | S3 | 0,01 | 0,01 | 0,01 |
-| CloudWatch, SNS, SSM, EventBridge | 0,00 | 0,00 | 0,00 |
-| Dự phòng chênh lệch vùng (+15%) | 0,00 | 0,01 | 0,09 |
-| **Tổng phần AWS** | **khoảng 0,02** | **khoảng 0,09** | **khoảng 0,72** |
+| CloudWatch (7 cảnh báo + 1 GB log mỗi 10.000 câu) | 0,95 | 1,40 | 5,90 |
+| **Tổng phần AWS** | **khoảng 1,03** | **1,92** | **khoảng 10,75** |
 | Gemini (giá trần) | 0,93 | 9,30 | 92,95 |
-| **Tổng cộng** | **khoảng 0,95** | **khoảng 9,38** | **khoảng 93,67** |
+| **Tổng cộng** | **khoảng 1,96** | **khoảng 11,22** | **khoảng 103,70** |
 
 Các điểm cần lưu ý khi đọc bảng:
 
-- Phần AWS gần như không đáng kể; chi phí chủ yếu là Gemini. Nếu dùng model rẻ hơn (giả định 0,10 và 0,40 USD cho 1 triệu token vào và ra) thì tổng cộng lần lượt khoảng 0,36, 3,43 và 34,17 USD.
+- Calculator không tính các mức miễn phí nên tổng phần AWS là con số trần. Khi áp dụng mức miễn phí của tài khoản (1 triệu lượt gọi và 400.000 GB-giây Lambda, 10 cảnh báo CloudWatch đầu tiên, 5 GB log), phần AWS ở mức 10.000 câu chỉ khoảng 0,1 USD. Chi phí chủ yếu vẫn là Gemini.
+- Nếu dùng model Gemini rẻ hơn (giả định 0,10 và 0,40 USD cho 1 triệu token vào và ra) thì tổng cộng lần lượt khoảng 1,37, 5,26 và 44,20 USD.
 - Giai đoạn demo chỉ dùng Gemini gói miễn phí thì chi phí Gemini bằng 0, nhưng gói này hay quá tải vào buổi tối.
-- Miễn phí Lambda dùng chung cho cả tài khoản. Nếu các Lambda khác của nhóm đã dùng hết, chi phí Lambda của chatbot khoảng 0,05, 0,43 và 4,25 USD ở ba kịch bản.
+- Miễn phí Lambda dùng chung cho cả tài khoản; nếu các Lambda khác của nhóm đã dùng hết thì áp dụng dòng Lambda giá đầy đủ ở trên.
 - Miễn phí 12 tháng của API Gateway chỉ dành cho tài khoản AWS mới; bảng đã tính theo giá đầy đủ.
 
-**So sánh với kiến trúc cũ.** OpenSearch Serverless tính 0,24 USD mỗi OCU-giờ, tối thiểu 2 OCU cho môi trường chạy thật (khoảng 350 USD mỗi tháng) hoặc 1 OCU cho môi trường thử nghiệm (khoảng 175 USD mỗi tháng), chưa kể NAT Gateway và mạng riêng. Bản hiện tại giảm chi phí cố định về gần 0, và ở mức 10.000 câu mỗi tháng vẫn nằm trong mục tiêu 5–10 USD của leader.
+**So sánh với kiến trúc cũ.** OpenSearch Serverless tính 0,24 USD mỗi OCU-giờ, tối thiểu 2 OCU cho môi trường chạy thật (khoảng 350 USD mỗi tháng) hoặc 1 OCU cho môi trường thử nghiệm (khoảng 175 USD mỗi tháng), chưa kể NAT Gateway và mạng riêng. Bản hiện tại giảm chi phí cố định về gần 0, và ở mức 10.000 câu mỗi tháng phần AWS khoảng 2 USD (khoảng 0,1 USD khi có mức miễn phí). Tổng cộng tiến sát mục tiêu 5–10 USD của leader khi dùng model Gemini rẻ hơn hoặc gói miễn phí.
 
 **Chiến lược tối ưu chi phí**
 

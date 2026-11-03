@@ -110,7 +110,7 @@ Current status: version v6 runs in the team's AWS account (region ap-southeast-1
 
 ### 6. Budget Estimation and Cost (Cost Estimation)
 
-**Method.** The estimate uses the published AWS and Google price lists, a realistic load scenario and measurements from the running chatbot. AWS unit prices come from the AWS pricing pages (US East), plus a 15% buffer for the difference to the Singapore region; final numbers should be cross-checked with the [AWS Pricing Calculator](https://calculator.aws/).
+**Method.** The estimate uses the published AWS and Google price lists, a realistic load scenario and measurements from the running chatbot. The AWS figures for the 10,000-question scenario come from the [AWS Pricing Calculator](https://calculator.aws/) (Singapore region, free tier excluded, so they are a ceiling); the 1,000 and 100,000 scenarios are scaled from it. The Gemini figures are our own assumptions from Google's price list, because Gemini is not part of AWS.
 
 **AWS Pricing Calculator estimate (Singapore, 10,000 questions/month scenario):** [https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f](https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f)
 
@@ -140,24 +140,24 @@ Current status: version v6 runs in the team's AWS account (region ap-southeast-1
 
 | Item | Demo: 1,000 questions | Trial: 10,000 questions | Growth: 100,000 questions |
 |---|---|---|---|
-| Lambda (within the free tier) | 0.00 | 0.00 | 0.00 |
-| API Gateway WebSocket | 0.00 | 0.02 | 0.23 |
-| DynamoDB | 0.00 | 0.04 | 0.39 |
+| Lambda (full price, no free tier) | 0.04 | 0.42 | 4.21 |
+| API Gateway WebSocket | 0.00 | 0.02 | 0.20 |
+| DynamoDB on-demand | 0.03 | 0.07 | 0.43 |
 | S3 | 0.01 | 0.01 | 0.01 |
-| CloudWatch, SNS, SSM, EventBridge | 0.00 | 0.00 | 0.00 |
-| Region buffer (+15%) | 0.00 | 0.01 | 0.09 |
-| **AWS subtotal** | **about 0.02** | **about 0.09** | **about 0.72** |
+| CloudWatch (7 alarms + 1 GB logs per 10,000 questions) | 0.95 | 1.40 | 5.90 |
+| **AWS subtotal** | **about 1.03** | **1.92** | **about 10.75** |
 | Gemini (ceiling price) | 0.93 | 9.30 | 92.95 |
-| **Total** | **about 0.95** | **about 9.38** | **about 93.67** |
+| **Total** | **about 1.96** | **about 11.22** | **about 103.70** |
 
 How to read the table:
 
-- The AWS part is almost negligible; Gemini is the main cost. With a cheaper model (assuming USD 0.10 and 0.40 per 1 million input and output tokens) the totals are about 0.36, 3.43 and 34.17.
+- The Calculator excludes free tiers, so the AWS subtotal is a ceiling. With the account's free tier (1 million Lambda requests and 400,000 GB-seconds, the first 10 CloudWatch alarms, 5 GB of logs), the AWS part at 10,000 questions is only about USD 0.1. Gemini remains the main cost.
+- With a cheaper Gemini model (assuming USD 0.10 and 0.40 per 1 million input and output tokens) the totals are about 1.37, 5.26 and 44.20.
 - If only the free Gemini tier is used during the demo phase, the Gemini cost is zero, but that tier is often overloaded in the evening.
-- The Lambda free tier is shared by the whole account. If the team's other Lambdas have used it up, the chatbot's Lambda cost is about 0.05, 0.43 and 4.25 for the three scenarios.
+- The Lambda free tier is shared by the whole account, so if the team's other Lambdas use it up, the full-price Lambda row applies.
 - The 12-month free tier of API Gateway is only for new AWS accounts; the table uses full prices.
 
-**Comparison with the old architecture.** OpenSearch Serverless costs USD 0.24 per OCU-hour, with a minimum of 2 OCUs for production (about USD 350 per month) or 1 OCU for dev/test (about USD 175 per month), before counting a NAT Gateway and the private network. The current version brings the fixed cost close to zero, and at 10,000 questions per month it still falls within our leader's USD 5–10 target.
+**Comparison with the old architecture.** OpenSearch Serverless costs USD 0.24 per OCU-hour, with a minimum of 2 OCUs for production (about USD 350 per month) or 1 OCU for dev/test (about USD 175 per month), before counting a NAT Gateway and the private network. The current version brings the fixed cost close to zero, and at 10,000 questions per month the AWS part is about USD 2 (about 0.1 with the free tier). The total approaches our leader's USD 5–10 target when a cheaper Gemini model or the free tier is used.
 
 **Cost optimization strategy**
 
