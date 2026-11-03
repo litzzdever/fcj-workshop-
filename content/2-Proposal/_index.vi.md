@@ -1,108 +1,225 @@
 ---
 title: "Bản đề xuất"
-date: 2024-01-01
+date: 2026-11-03
 weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
-{{% notice warning %}}
-⚠️ **Lưu ý:** Các thông tin dưới đây chỉ nhằm mục đích tham khảo, vui lòng **không sao chép nguyên văn** cho bài báo cáo của bạn kể cả warning này.
-{{% /notice %}}
 
-Tại phần này, bạn cần tóm tắt các nội dung trong workshop mà bạn **dự tính** sẽ làm.
+# Conversational Commerce Agent
+## Chatbot RAG tư vấn phụ tùng xe máy trên AWS Serverless
 
-# IoT Weather Platform for Lab Research  
-## Giải pháp AWS Serverless hợp nhất cho giám sát thời tiết thời gian thực  
+### 1. Tổng quan bài toán và giải pháp
 
-### 1. Tóm tắt điều hành  
-IoT Weather Platform được thiết kế dành cho nhóm *ITea Lab* tại TP. Hồ Chí Minh nhằm nâng cao khả năng thu thập và phân tích dữ liệu thời tiết. Nền tảng hỗ trợ tối đa 5 trạm thời tiết, có khả năng mở rộng lên 10–15 trạm, sử dụng thiết bị biên Raspberry Pi kết hợp cảm biến ESP32 để truyền dữ liệu qua MQTT. Nền tảng tận dụng các dịch vụ AWS Serverless để cung cấp giám sát thời gian thực, phân tích dự đoán và tiết kiệm chi phí, với quyền truy cập giới hạn cho 5 thành viên phòng lab thông qua Amazon Cognito.  
+Website bán phụ tùng xe máy của nhóm cần một nhân viên tư vấn trực tuyến hoạt động 24/7: trả lời giá, tồn kho, phụ tùng nào lắp vừa xe của khách, giải đáp chính sách bảo hành, đổi trả, vận chuyển, thêm hàng vào giỏ và chuyển cho nhân viên thật khi cần.
 
-### 2. Tuyên bố vấn đề  
-*Vấn đề hiện tại*  
-Các trạm thời tiết hiện tại yêu cầu thu thập dữ liệu thủ công, khó quản lý khi có nhiều trạm. Không có hệ thống tập trung cho dữ liệu hoặc phân tích thời gian thực, và các nền tảng bên thứ ba thường tốn kém và quá phức tạp.  
+Giải pháp là một chatbot RAG (Retrieval-Augmented Generation) chạy hoàn toàn bằng dịch vụ AWS theo nhu cầu (serverless) kết hợp Google Gemini API. Với mỗi câu hỏi, chatbot tìm các sản phẩm và đoạn tài liệu chính sách liên quan rồi nhờ Gemini soạn câu trả lời tiếng Việt, chỉ dựa trên dữ liệu tìm được nên không bịa giá hay tồn kho. Chatbot kết nối với website qua một địa chỉ WebSocket duy nhất.
 
-*Giải pháp*  
-Nền tảng sử dụng AWS IoT Core để tiếp nhận dữ liệu MQTT, AWS Lambda và API Gateway để xử lý, Amazon S3 để lưu trữ (bao gồm data lake), và AWS Glue Crawlers cùng các tác vụ ETL để trích xuất, chuyển đổi, tải dữ liệu từ S3 data lake sang một S3 bucket khác để phân tích. AWS Amplify với Next.js cung cấp giao diện web, và Amazon Cognito đảm bảo quyền truy cập an toàn. Tương tự như Thingsboard và CoreIoT, người dùng có thể đăng ký thiết bị mới và quản lý kết nối, nhưng nền tảng này hoạt động ở quy mô nhỏ hơn và phục vụ mục đích sử dụng nội bộ. Các tính năng chính bao gồm bảng điều khiển thời gian thực, phân tích xu hướng và chi phí vận hành thấp.  
+Điểm khác biệt so với phương án ban đầu: bản đầu dùng Amazon OpenSearch Serverless và model embedding chạy trong Lambda (chi phí cố định khoảng 175–350 USD mỗi tháng). Bản hiện tại bỏ OpenSearch, lưu vector trong file JSON trên S3 và dùng Gemini để tạo embedding, nên chi phí cố định gần bằng 0 và chi phí tăng theo số câu hỏi thật.
 
-*Lợi ích và hoàn vốn đầu tư (ROI)*  
-Giải pháp tạo nền tảng cơ bản để các thành viên phòng lab phát triển một nền tảng IoT lớn hơn, đồng thời cung cấp nguồn dữ liệu cho những người nghiên cứu AI phục vụ huấn luyện mô hình hoặc phân tích. Nền tảng giảm bớt báo cáo thủ công cho từng trạm thông qua hệ thống tập trung, đơn giản hóa quản lý và bảo trì, đồng thời cải thiện độ tin cậy dữ liệu. Chi phí hàng tháng ước tính 0,66 USD (theo AWS Pricing Calculator), tổng cộng 7,92 USD cho 12 tháng. Tất cả thiết bị IoT đã được trang bị từ hệ thống trạm thời tiết hiện tại, không phát sinh chi phí phát triển thêm. Thời gian hoàn vốn 6–12 tháng nhờ tiết kiệm đáng kể thời gian thao tác thủ công.  
+Trạng thái hiện tại: phiên bản v6 đã chạy trên tài khoản AWS của nhóm (vùng ap-southeast-1), đạt toàn bộ bài kiểm thử đầu cuối ngày 30/10/2026. Phần còn lại là ba cải tiến theo góp ý của leader (mục 5).
 
-### 3. Kiến trúc giải pháp  
-Nền tảng áp dụng kiến trúc AWS Serverless để quản lý dữ liệu từ 5 trạm dựa trên Raspberry Pi, có thể mở rộng lên 15 trạm. Dữ liệu được tiếp nhận qua AWS IoT Core, lưu trữ trong S3 data lake và xử lý bởi AWS Glue Crawlers và ETL jobs để chuyển đổi và tải vào một S3 bucket khác cho mục đích phân tích. Lambda và API Gateway xử lý bổ sung, trong khi Amplify với Next.js cung cấp bảng điều khiển được bảo mật bởi Cognito.  
+### 2. Mục tiêu và phạm vi
 
-![IoT Weather Station Architecture](/images/2-Proposal/edge_architecture.jpeg)
+**Bối cảnh và đối tượng sử dụng**
 
-![IoT Weather Platform Architecture](/images/2-Proposal/platform_architecture.jpeg)
+- Khách hàng của website bán phụ tùng xe máy: cần tư vấn nhanh theo dòng xe và đời xe của mình.
+- Nhân viên chăm sóc khách hàng (CSKH): chỉ muốn nhận những yêu cầu bot không tự giải quyết được, kèm đủ ngữ cảnh.
+- Nhóm phát triển: cần hệ thống rẻ, dễ vận hành, tích hợp được vào backend và frontend hiện có.
 
-*Dịch vụ AWS sử dụng*  
-- *AWS IoT Core*: Tiếp nhận dữ liệu MQTT từ 5 trạm, mở rộng lên 15.  
-- *AWS Lambda*: Xử lý dữ liệu và kích hoạt Glue jobs (2 hàm).  
-- *Amazon API Gateway*: Giao tiếp với ứng dụng web.  
-- *Amazon S3*: Lưu trữ dữ liệu thô (data lake) và dữ liệu đã xử lý (2 bucket).  
-- *AWS Glue*: Crawlers lập chỉ mục dữ liệu, ETL jobs chuyển đổi và tải dữ liệu.  
-- *AWS Amplify*: Lưu trữ giao diện web Next.js.  
-- *Amazon Cognito*: Quản lý quyền truy cập cho người dùng phòng lab.  
+**Mục tiêu cụ thể và tiêu chí hoàn thành**
 
-*Thiết kế thành phần*  
-- *Thiết bị biên*: Raspberry Pi thu thập và lọc dữ liệu cảm biến, gửi tới IoT Core.  
-- *Tiếp nhận dữ liệu*: AWS IoT Core nhận tin nhắn MQTT từ thiết bị biên.  
-- *Lưu trữ dữ liệu*: Dữ liệu thô lưu trong S3 data lake; dữ liệu đã xử lý lưu ở một S3 bucket khác.  
-- *Xử lý dữ liệu*: AWS Glue Crawlers lập chỉ mục dữ liệu; ETL jobs chuyển đổi để phân tích.  
-- *Giao diện web*: AWS Amplify lưu trữ ứng dụng Next.js cho bảng điều khiển và phân tích thời gian thực.  
-- *Quản lý người dùng*: Amazon Cognito giới hạn 5 tài khoản hoạt động.  
+| Mục tiêu | Tiêu chí đo lường | Kết quả hiện tại |
+|---|---|---|
+| Trả lời đúng chính sách | 6/6 câu kiểm thử về bảo hành, đổi trả, vận chuyển trả lời đúng và ghi nguồn tài liệu | 6/6 |
+| Tư vấn sản phẩm đúng dữ liệu | 12/12 câu kiểm thử theo xe và đúng mã sản phẩm | 12/12 |
+| Không bịa ngoài phạm vi | 4/4 câu ngoài chủ đề (thời tiết, thơ, bitcoin, nấu ăn) không gợi ý sản phẩm, không tạo phiếu | 4/4 |
+| Thêm giỏ hàng an toàn | Từ chối số lượng vượt tồn kho hoặc quá 10, không tự đổi số lượng của khách | Đạt |
+| Chuyển nhân viên | Nhân viên nhận đúng 1 email Gmail kèm mã yêu cầu, ngữ cảnh | Đạt |
+| Phản hồi nhanh | Khoảng 2–3 giây mỗi câu khi Gemini ổn định | Khoảng 2–3 giây |
+| Chi phí thấp | Từ 10 USD mỗi tháng trở xuống ở mức 10.000 câu hỏi mỗi tháng | Khoảng 9,4 USD (xem mục 6) |
 
-### 4. Triển khai kỹ thuật  
-*Các giai đoạn triển khai*  
-Dự án gồm 2 phần — thiết lập trạm thời tiết biên và xây dựng nền tảng thời tiết — mỗi phần trải qua 4 giai đoạn:  
-1. *Nghiên cứu và vẽ kiến trúc*: Nghiên cứu Raspberry Pi với cảm biến ESP32 và thiết kế kiến trúc AWS Serverless (1 tháng trước kỳ thực tập).  
-2. *Tính toán chi phí và kiểm tra tính khả thi*: Sử dụng AWS Pricing Calculator để ước tính và điều chỉnh (Tháng 1).  
-3. *Điều chỉnh kiến trúc để tối ưu chi phí/giải pháp*: Tinh chỉnh (ví dụ tối ưu Lambda với Next.js) để đảm bảo hiệu quả (Tháng 2).  
-4. *Phát triển, kiểm thử, triển khai*: Lập trình Raspberry Pi, AWS services với CDK/SDK và ứng dụng Next.js, sau đó kiểm thử và đưa vào vận hành (Tháng 2–3).  
+**Phạm vi thực hiện**
 
-*Yêu cầu kỹ thuật*  
-- *Trạm thời tiết biên*: Cảm biến (nhiệt độ, độ ẩm, lượng mưa, tốc độ gió), vi điều khiển ESP32, Raspberry Pi làm thiết bị biên. Raspberry Pi chạy Raspbian, sử dụng Docker để lọc dữ liệu và gửi 1 MB/ngày/trạm qua MQTT qua Wi-Fi.  
-- *Nền tảng thời tiết*: Kiến thức thực tế về AWS Amplify (lưu trữ Next.js), Lambda (giảm thiểu do Next.js xử lý), AWS Glue (ETL), S3 (2 bucket), IoT Core (gateway và rules), và Cognito (5 người dùng). Sử dụng AWS CDK/SDK để lập trình (ví dụ IoT Core rules tới S3). Next.js giúp giảm tải Lambda cho ứng dụng web fullstack.  
+- Trong phạm vi: hỏi đáp sản phẩm và chính sách, đối chiếu xe trong Garage của khách, giỏ hàng (thêm, xem), chuyển nhân viên qua email, giám sát và cảnh báo, giới hạn chống lạm dụng, tài liệu vận hành.
+- Ngoài phạm vi: thanh toán, tạo hoặc hủy đơn hàng, nhận ảnh từ khách, hỗ trợ ngôn ngữ ngoài tiếng Việt và tiếng Anh.
 
-### 5. Lộ trình & Mốc triển khai  
-- *Trước thực tập (Tháng 0)*: 1 tháng lên kế hoạch và đánh giá trạm cũ.  
-- *Thực tập (Tháng 1–3)*:  
-    - Tháng 1: Học AWS và nâng cấp phần cứng.  
-    - Tháng 2: Thiết kế và điều chỉnh kiến trúc.  
-    - Tháng 3: Triển khai, kiểm thử, đưa vào sử dụng.  
-- *Sau triển khai*: Nghiên cứu thêm trong vòng 1 năm.  
+**Phù hợp định hướng Cloud và AWS.** Toàn bộ chatbot dùng kiến trúc serverless trả tiền theo lượt dùng: API Gateway, Lambda, DynamoDB, S3, EventBridge, Systems Manager Parameter Store, CloudWatch.
 
-### 6. Ước tính ngân sách  
-Có thể xem chi phí trên [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=621f38b12a1ef026842ba2ddfe46ff936ed4ab01)  
-Hoặc tải [tệp ước tính ngân sách](../attachments/budget_estimation.pdf).  
+### 3. Vấn đề cần giải quyết
 
-*Chi phí hạ tầng*  
-- AWS Lambda: 0,00 USD/tháng (1.000 request, 512 MB lưu trữ).  
-- S3 Standard: 0,15 USD/tháng (6 GB, 2.100 request, 1 GB quét).  
-- Truyền dữ liệu: 0,02 USD/tháng (1 GB vào, 1 GB ra).  
-- AWS Amplify: 0,35 USD/tháng (256 MB, request 500 ms).  
-- Amazon API Gateway: 0,01 USD/tháng (2.000 request).  
-- AWS Glue ETL Jobs: 0,02 USD/tháng (2 DPU).  
-- AWS Glue Crawlers: 0,07 USD/tháng (1 crawler).  
-- MQTT (IoT Core): 0,08 USD/tháng (5 thiết bị, 45.000 tin nhắn).  
+1. **Khách khó chọn đúng phụ tùng.** Cùng một loại phụ tùng nhưng mỗi dòng xe và đời xe lắp một loại khác nhau. Khách hay mua nhầm rồi đổi trả, nhân viên mất thời gian trả lời lặp đi lặp lại.
+2. **Không có người trực ngoài giờ.** Câu hỏi về giá, tồn kho, chính sách đến bất kỳ lúc nào.
+3. **Chatbot dùng AI dễ bịa thông tin.** Với bán hàng, sai giá hoặc báo còn hàng khi đã hết gây thiệt hại thật. Hệ thống phải chỉ trả lời từ dữ liệu của cửa hàng.
+4. **Chi phí hạ tầng cho chatbot dễ vượt quá giá trị mang lại.** Phiên bản đầu tiên dùng OpenSearch Serverless và mạng riêng (VPC, NAT) có chi phí cố định hàng trăm USD mỗi tháng, không phù hợp với một dự án nhỏ. Leader đã đặt mục tiêu 5–10 USD mỗi tháng.
+5. **Cần chuyển cho người thật đúng lúc.** Khi khách khiếu nại hoặc bot không giải quyết được, nhân viên phải nhận được đủ ngữ cảnh mà không phải hỏi lại.
+6. **Cần vận hành được.** Gemini bản miễn phí hay quá tải vào buổi tối, vì vậy hệ thống phải có phương án dự phòng, giới hạn tần suất và cảnh báo.
 
-*Tổng*: 0,7 USD/tháng, 8,40 USD/12 tháng  
-- *Phần cứng*: 265 USD một lần (Raspberry Pi 5 và cảm biến).  
+### 4. Kiến trúc giải pháp sơ bộ
 
-### 7. Đánh giá rủi ro  
-*Ma trận rủi ro*  
-- Mất mạng: Ảnh hưởng trung bình, xác suất trung bình.  
-- Hỏng cảm biến: Ảnh hưởng cao, xác suất thấp.  
-- Vượt ngân sách: Ảnh hưởng trung bình, xác suất thấp.  
+![Khung 3: Chatbot RAG](/images/2-Proposal/chatbot_architecture.png)
 
-*Chiến lược giảm thiểu*  
-- Mạng: Lưu trữ cục bộ trên Raspberry Pi với Docker.  
-- Cảm biến: Kiểm tra định kỳ, dự phòng linh kiện.  
-- Chi phí: Cảnh báo ngân sách AWS, tối ưu dịch vụ.  
+**Luồng hỏi đáp (đi từ trái sang phải trong sơ đồ):**
 
-*Kế hoạch dự phòng*  
-- Quay lại thu thập thủ công nếu AWS gặp sự cố.  
-- Sử dụng CloudFormation để khôi phục cấu hình liên quan đến chi phí.  
+1. Website gửi câu hỏi qua **API Gateway (WebSocket)**.
+2. **ChatReceiverHandler** nhận và gọi bất đồng bộ **ChatOrchestratorHandler**, để kết nối không bị treo trong lúc AI xử lý.
+3. **ChatOrchestratorHandler** kiểm tra giới hạn tần suất, tạo vector cho câu hỏi bằng **Gemini Embedding**, tìm trong kho vector trên **S3** (đã nạp vào RAM), bổ sung giá và tồn kho mới nhất, xe trong Garage và lịch sử hội thoại từ **DynamoDB**.
+4. Orchestrator gọi **Gemini** để soạn câu trả lời. Gemini có thể gọi công cụ thêm giỏ hàng hoặc chuyển nhân viên, và mỗi công cụ đều được kiểm tra lại bằng mã chương trình.
+5. Câu trả lời được đẩy về đúng kết nối của khách qua API Gateway.
+6. Khóa Gemini lấy từ **SSM Parameter Store**, không nằm trong code.
 
-### 8. Kết quả kỳ vọng  
-*Cải tiến kỹ thuật*: Dữ liệu và phân tích thời gian thực thay thế quy trình thủ công. Có thể mở rộng tới 10–15 trạm.  
-*Giá trị dài hạn*: Nền tảng dữ liệu 1 năm cho nghiên cứu AI, có thể tái sử dụng cho các dự án tương lai.
+**Luồng chuyển nhân viên:** Orchestrator phát sự kiện lên **EventBridge** → **HandoverMailerHandler** soạn thư → gửi qua **Gmail SMTP** đến hộp thư nhân viên.
+
+**Giám sát:** CloudWatch theo dõi lỗi và độ trễ của Lambda, DynamoDB, WebSocket và số lần Gemini lỗi; khi bất thường thì báo qua SNS đến email của nhóm.
+
+**Các dịch vụ sử dụng**
+
+| Dịch vụ | Vai trò |
+|---|---|
+| Amazon API Gateway (WebSocket) | Cổng nhận tin và đẩy câu trả lời về khách |
+| AWS Lambda (3 hàm) | `chat-receiver`, `chat-orchestrator`, `chat-handover-mailer` |
+| Amazon S3 | Kho vector của tài liệu và sản phẩm (`kb.json`, `products.json`) |
+| Amazon DynamoDB | Sản phẩm, giỏ hàng, khách hàng, lịch sử hội thoại, bộ đếm giới hạn tần suất |
+| AWS Systems Manager Parameter Store | Lưu khóa Gemini và mật khẩu ứng dụng Gmail (miễn phí, thay cho Secrets Manager) |
+| Amazon EventBridge | Chuyển sự kiện yêu cầu gặp nhân viên |
+| Amazon CloudWatch và Amazon SNS | Cảnh báo lỗi, độ trễ, Gemini quá tải |
+| AWS IAM | Role riêng, quyền tối thiểu cho từng Lambda |
+| Google Gemini API (ngoài AWS) | Tạo embedding và soạn câu trả lời |
+
+**Ba cải tiến đang thực hiện theo góp ý của leader**
+
+- **Đóng gói Lambda bằng .zip thay vì Docker và ECR.** Sau khi bỏ torch, mình đã đo gói thật: 39 MB giải nén, 10,9 MB nén, nằm trong giới hạn của Lambda (250 MB giải nén, 50 MB nén). Cách này bỏ hẳn ECR và bước build image.
+- **Khung 4, tự động đồng bộ vector.** Thay vì chạy script `build_vector_snapshot.py` bằng tay, bật DynamoDB Streams trên bảng Products để một Lambda đồng bộ tự tạo embedding bằng Gemini và cập nhật file vector trên S3 mỗi khi sản phẩm đổi. Tài liệu chính sách trên S3 cũng kích hoạt cập nhật tương tự.
+- **Viết hạ tầng bằng Terraform** theo cấu trúc của dự án (thêm các file chatbot như `lambda_chatbot.tf`, `iam_chatbot.tf`, `eventbridge.tf`, `monitoring.tf`), thay cho các file CloudFormation đang dùng.
+
+### 5. Kế hoạch và timeline thực hiện
+
+| Giai đoạn | Thời gian | Kết quả |
+|---|---|---|
+| Thiết kế và phiên bản đầu (OpenSearch Serverless) | Đến 24/10/2026 | Chatbot chạy được, nhưng chi phí cố định cao |
+| Chuyển sang v2 không OpenSearch, triển khai trên tài khoản của nhóm | 25–27/10 | Vector trên S3, embedding bằng Gemini, 3 Lambda chạy |
+| Chuyển nhân viên bằng Gmail SMTP, dọn tài khoản cũ | 28/10 | Email thật thay cho SNS, đã xóa OpenSearch ở tài khoản cũ |
+| Tối ưu prompt và dự phòng (v6), kiểm thử đầu cuối | 30/10 | 39 test offline đạt; kiểm thử qua WebSocket đạt |
+| Tài liệu vận hành và Proposal | 30/10–03/11 | Tài liệu từng bước theo sơ đồ Khung 3, bản đề xuất này |
+| Sửa theo góp ý leader: gói .zip, Khung 4 tự đồng bộ, Terraform | Dự kiến tuần 03–09/11 | Hạ tầng đúng chuẩn dự án, không còn ECR, vector tự cập nhật |
+| Gắn chatbot vào website, thử nghiệm với người dùng thật | Sau khi hoàn tất các bước trên | Chạy thật trên website của nhóm |
+| Xác thực bằng Lambda authorizer (Cognito), bật thanh toán Gemini trước buổi demo | Trước demo | Không giả mạo được mã khách; không bị quá tải giờ cao điểm |
+
+### 6. Bảng dự toán ngân sách và chi phí (Cost Estimation)
+
+**Cách tính.** Dự toán dựa trên bảng giá công bố của AWS và Google, kịch bản tải thực tế và số liệu đo từ chatbot đang chạy. Các đơn giá AWS lấy theo bảng giá của trang giá AWS (vùng US East), cộng 15% dự phòng cho chênh lệch vùng Singapore; con số cuối cùng nên đối chiếu bằng [AWS Pricing Calculator](https://calculator.aws/).
+
+<!-- TODO: dán link ước tính đã lưu trên AWS Pricing Calculator vào đây -->
+
+**Giả định cho mỗi câu hỏi (đo từ chatbot đang chạy)**
+
+| Thông số | Giá trị |
+|---|---|
+| Tin nhắn WebSocket | 2 (1 gửi vào, 1 trả về) |
+| Phút kết nối WebSocket | 1 (tính thận trọng, mỗi câu một kết nối) |
+| Lambda orchestrator | 1.024 MB, khoảng 2,5 giây, tức 2,5 GB-giây |
+| Lambda khác | 2 lượt gọi, không đáng kể |
+| DynamoDB | 5 lượt ghi, 6 lượt đọc (đã gồm bộ đếm giới hạn tần suất, lịch sử, giỏ hàng) |
+| Gemini | Khoảng 2.500 token vào, 200 token ra, 30 token embedding |
+
+**Đơn giá sử dụng**
+
+| Dịch vụ | Đơn giá |
+|---|---|
+| Lambda | 0,20 USD mỗi 1 triệu lượt gọi; 0,0000166667 USD mỗi GB-giây; miễn phí 1 triệu lượt và 400.000 GB-giây mỗi tháng |
+| API Gateway WebSocket | 1,00 USD mỗi 1 triệu tin nhắn; 0,25 USD mỗi 1 triệu phút kết nối |
+| DynamoDB theo yêu cầu | 0,625 USD mỗi 1 triệu lượt ghi; 0,125 USD mỗi 1 triệu lượt đọc; miễn phí 25 GB lưu trữ |
+| S3 | Dữ liệu vector dưới 1 MB nên chi phí lưu trữ gần như 0; yêu cầu kiểm tra phiên bản khoảng 8.640 lượt mỗi tháng |
+| SSM Parameter Store (loại Standard), SNS email, 10 cảnh báo CloudWatch đầu tiên, EventBridge (vài chục sự kiện) | Trong mức miễn phí hoặc không đáng kể |
+| Gemini (giả định trần, cần kiểm tra lại trên trang giá của Google) | 0,25 USD mỗi 1 triệu token vào; 1,50 USD mỗi 1 triệu token ra; embedding 0,15 USD mỗi 1 triệu token |
+
+**Dự toán theo ba kịch bản (USD mỗi tháng)**
+
+| Hạng mục | Demo: 1.000 câu | Thử nghiệm: 10.000 câu | Mở rộng: 100.000 câu |
+|---|---|---|---|
+| Lambda (trong mức miễn phí) | 0,00 | 0,00 | 0,00 |
+| API Gateway WebSocket | 0,00 | 0,02 | 0,23 |
+| DynamoDB | 0,00 | 0,04 | 0,39 |
+| S3 | 0,01 | 0,01 | 0,01 |
+| CloudWatch, SNS, SSM, EventBridge | 0,00 | 0,00 | 0,00 |
+| Dự phòng chênh lệch vùng (+15%) | 0,00 | 0,01 | 0,09 |
+| **Tổng phần AWS** | **khoảng 0,02** | **khoảng 0,09** | **khoảng 0,72** |
+| Gemini (giá trần) | 0,93 | 9,30 | 92,95 |
+| **Tổng cộng** | **khoảng 0,95** | **khoảng 9,38** | **khoảng 93,67** |
+
+Các điểm cần lưu ý khi đọc bảng:
+
+- Phần AWS gần như không đáng kể; chi phí chủ yếu là Gemini. Nếu dùng model rẻ hơn (giả định 0,10 và 0,40 USD cho 1 triệu token vào và ra) thì tổng cộng lần lượt khoảng 0,36, 3,43 và 34,17 USD.
+- Giai đoạn demo chỉ dùng Gemini gói miễn phí thì chi phí Gemini bằng 0, nhưng gói này hay quá tải vào buổi tối.
+- Miễn phí Lambda dùng chung cho cả tài khoản. Nếu các Lambda khác của nhóm đã dùng hết, chi phí Lambda của chatbot khoảng 0,05, 0,43 và 4,25 USD ở ba kịch bản.
+- Miễn phí 12 tháng của API Gateway chỉ dành cho tài khoản AWS mới; bảng đã tính theo giá đầy đủ.
+
+**So sánh với kiến trúc cũ.** OpenSearch Serverless tính 0,24 USD mỗi OCU-giờ, tối thiểu 2 OCU cho môi trường chạy thật (khoảng 350 USD mỗi tháng) hoặc 1 OCU cho môi trường thử nghiệm (khoảng 175 USD mỗi tháng), chưa kể NAT Gateway và mạng riêng. Bản hiện tại giảm chi phí cố định về gần 0, và ở mức 10.000 câu mỗi tháng vẫn nằm trong mục tiêu 5–10 USD của leader.
+
+**Chiến lược tối ưu chi phí**
+
+1. **Bỏ OpenSearch, đặt vector trên S3** (đã làm): tránh 175–350 USD mỗi tháng.
+2. **Không dùng VPC và NAT Gateway** (đã làm): Lambda gọi thẳng Gemini qua Internet.
+3. **Dùng SSM Parameter Store thay Secrets Manager** (đã làm): Secrets Manager tính phí theo từng bí mật mỗi tháng và theo lượt gọi API, còn SSM loại Standard miễn phí.
+4. **Không gọi AI khi không cần** (đã làm): câu ngoài phạm vi trả lời có sẵn; xem giỏ hàng đọc thẳng DynamoDB, không qua Gemini.
+5. **Giảm token mỗi câu hỏi**: chỉ gửi 3 sản phẩm và 3 đoạn tài liệu, giữ 6 tin gần nhất; đặt giới hạn độ dài câu hỏi 500 ký tự (đã làm).
+6. **Đóng gói .zip bỏ ECR và bước build image** (đang làm).
+7. **Giới hạn chi tiêu theo ngân sách.** Mức trần hiện tại 2.000 câu mỗi ngày tương ứng tối đa khoảng 18 USD mỗi ngày ở giá Gemini trần. Để bám mục tiêu 10 USD mỗi tháng, nên hạ mức trần xuống khoảng 350–400 câu mỗi ngày bằng biến môi trường `RL_GLOBAL_PER_DAY`, và bật AWS Budgets (hiện chưa bật vì thiếu quyền).
+8. **Vòng đời dữ liệu.** Phiên hội thoại, bộ đếm giới hạn và giỏ hàng tự hết hạn bằng TTL của DynamoDB (thuộc tính `expires_at`). Đặt thời gian giữ log CloudWatch 14 đến 30 ngày và thêm S3 Lifecycle Policy tự xóa các bản đóng gói Lambda cũ sau 30 ngày (sẽ thêm trong Terraform).
+9. **Dùng Gemini gói miễn phí khi thử nghiệm**, chỉ bật thanh toán trước buổi demo thật; cân nhắc model rẻ hơn khi tải tăng.
+
+**Quy trình dọn dẹp tài nguyên sau khi thực hành**
+
+Làm theo thứ tự dưới đây để không phát sinh chi phí ngoài ý muốn. Không xóa các bảng `Products`, `Users`, `Carts` vì chúng dùng chung với ứng dụng của nhóm.
+
+1. Xóa các bản stack (hiện dùng CloudFormation):
+   ```bash
+   aws cloudformation delete-stack --stack-name chatbot-ops
+   aws cloudformation delete-stack --stack-name chatbot-mailer
+   aws cloudformation delete-stack --stack-name chatbot-v2
+   ```
+   Nếu đã chuyển sang Terraform thì chạy `terraform destroy` trong thư mục `terraform/`.
+2. Làm rỗng rồi xóa bucket vector và bucket chứa gói Lambda:
+   ```bash
+   aws s3 rb s3://<tên-bucket-vector> --force
+   ```
+3. Xóa nhóm log (stack không tự xóa log do Lambda tạo):
+   ```bash
+   aws logs delete-log-group --log-group-name /aws/lambda/chat-receiver
+   aws logs delete-log-group --log-group-name /aws/lambda/chat-orchestrator-v2
+   aws logs delete-log-group --log-group-name /aws/lambda/chat-handover-mailer
+   ```
+4. Xóa tham số khóa Gemini và mật khẩu ứng dụng Gmail trong SSM: `aws ssm delete-parameter --name /chatbot/gemini_api_key` (và tham số mật khẩu Gmail).
+5. Nếu còn dùng Docker: `aws ecr delete-repository --repository-name chat-orchestrator-v2 --force`.
+6. Nếu đã tạo ngân sách: `aws budgets delete-budget`.
+7. Kiểm tra không còn tài nguyên tính phí:
+   ```bash
+   aws ec2 describe-nat-gateways
+   aws ec2 describe-addresses
+   aws opensearchserverless list-collections
+   ```
+8. Thu hồi khóa Gemini trên Google AI Studio và tắt thanh toán Gemini nếu đã bật.
+
+### 7. Rủi ro và phương án giảm thiểu
+
+| Rủi ro | Mức ảnh hưởng | Khả năng xảy ra | Phương án giảm thiểu |
+|---|---|---|---|
+| Gemini quá tải hoặc hết hạn mức (đặc biệt gói miễn phí vào buổi tối) | Cao | Cao | Chuỗi 3 model dự phòng, ngắt mạch tạm thời, câu trả lời dự phòng chỉ trình bày kết quả tìm kiếm; cảnh báo khi Gemini lỗi nhiều; bật thanh toán trước demo |
+| Chi phí vượt dự toán (Gemini tính theo token) | Trung bình | Trung bình | Hạ mức trần câu hỏi mỗi ngày, bật AWS Budgets, giới hạn token mỗi câu, theo dõi hằng tuần |
+| Bot bịa giá hoặc tồn kho | Cao | Thấp | Chỉ trả lời từ dữ liệu tìm được; đọc lại giá và tồn kho từ DynamoDB mỗi câu hỏi; kiểm thử câu ngoài phạm vi |
+| Bot tư vấn sai xe lắp vừa | Trung bình | Trung bình | Prompt bắt đối chiếu mục "Lắp vừa xe"; kiểm thử 12 câu theo xe; hướng phát triển: kiểm tra tương thích bằng mã trước khi thêm vào giỏ |
+| Dữ liệu vector cũ so với dữ liệu thật | Trung bình | Trung bình | Giá và tồn kho luôn đọc mới; Khung 4 tự đồng bộ vector khi sản phẩm đổi |
+| Giả mạo mã khách để dùng giỏ hàng của người khác | Cao | Thấp khi demo, cao khi chạy thật | Có sẵn Lambda authorizer (JWT Cognito) lấy mã khách từ token; bật trước khi chạy thật |
+| Lạm dụng, gửi quá nhiều câu hỏi | Trung bình | Trung bình | Giới hạn theo phiên, theo kết nối và theo ngày; giới hạn độ dài câu hỏi |
+| Lộ khóa API | Cao | Thấp | Khóa chỉ nằm trong SSM, không nằm trong code hay repo; xoay khóa khi nghi ngờ lộ |
+| Thiếu quyền trên tài khoản AWS của nhóm (ví dụ Budgets, Streams) | Thấp | Trung bình | Dùng `preflight.sh` kiểm tra quyền trước khi triển khai; tạo từng phần độc lập |
+| Mất email chuyển nhân viên hoặc gửi trùng | Trung bình | Thấp | Chỉ gửi 1 yêu cầu mỗi phiên trong 10 phút; có mã yêu cầu để truy vết; có cảnh báo lỗi Lambda |
+
+**Phương án dự phòng.** Nếu Gemini hoặc AWS gặp sự cố kéo dài, website vẫn hiển thị khung chat và bot chuyển sang câu trả lời dự phòng kèm số hotline CSKH; mọi yêu cầu quan trọng đi theo kênh nhân viên.
+
+### 8. Kết quả kỳ vọng
+
+- Khách nhận tư vấn đúng xe, đúng giá, đúng tồn kho trong 2–3 giây, 24/7.
+- Nhân viên CSKH chỉ xử lý những yêu cầu thật sự cần người, kèm đủ ngữ cảnh.
+- Chi phí vận hành thấp, tăng theo mức sử dụng thật: khoảng 9,4 USD mỗi tháng ở 10.000 câu hỏi.
+- Hạ tầng quản lý bằng mã (Terraform) cùng chuẩn với các phần khác của dự án, dễ dựng lại và dọn dẹp.
