@@ -112,7 +112,7 @@ Current status: version v6 runs in the team's AWS account (region ap-southeast-1
 
 **Method.** The estimate uses the published AWS and Google price lists, a realistic load scenario and measurements from the running chatbot. AWS unit prices come from the AWS pricing pages (US East), plus a 15% buffer for the difference to the Singapore region; final numbers should be cross-checked with the [AWS Pricing Calculator](https://calculator.aws/).
 
-<!-- TODO: paste the saved AWS Pricing Calculator estimate link here -->
+**AWS Pricing Calculator estimate (Singapore, 10,000 questions/month scenario):** [https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f](https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f)
 
 **Assumptions per question (measured on the running chatbot)**
 

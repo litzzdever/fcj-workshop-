@@ -109,7 +109,7 @@ Trạng thái hiện tại: phiên bản v6 đã chạy trên tài khoản AWS c
 
 **Cách tính.** Dự toán dựa trên bảng giá công bố của AWS và Google, kịch bản tải thực tế và số liệu đo từ chatbot đang chạy. Các đơn giá AWS lấy theo bảng giá của trang giá AWS (vùng US East), cộng 15% dự phòng cho chênh lệch vùng Singapore; con số cuối cùng nên đối chiếu bằng [AWS Pricing Calculator](https://calculator.aws/).
 
-<!-- TODO: dán link ước tính đã lưu trên AWS Pricing Calculator vào đây -->
+**Bản ước tính trên AWS Pricing Calculator (vùng Singapore, kịch bản 10.000 câu hỏi/tháng):** [https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f](https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f)
 
 **Giả định cho mỗi câu hỏi (đo từ chatbot đang chạy)**
 
