@@ -1,57 +1,41 @@
 ---
 title: "Week 8 Worklog"
-date: 2024-01-01
-weight: 1
+date: 2026-11-03
+weight: 8
 chapter: false
 pre: " <b> 1.8. </b> "
 ---
-{{% notice warning %}} 
-⚠️ **Note:** The following information is for reference purposes only. Please **do not copy verbatim** for your own report, including this warning.
-{{% /notice %}}
-
 
 ### Week 8 Objectives:
 
-* Connect and get acquainted with members of First Cloud AI Journey.
-* Understand basic AWS services, how to use the console & CLI.
+* Learn Amazon EKS, Kubernetes fundamentals, and the difference between EKS standard and EKS Auto Mode.
+* Set up a command-line environment in AWS CloudShell with AWS CLI, kubectl, and eksctl, using an IAM user instead of the root account.
+* Complete the Quickstart tutorial: create an EKS Auto Mode cluster, deploy the 2048 app behind an ALB, and store data on EBS.
+* Build an EKS cluster by hand with the Console and AWS CLI: VPC, IAM roles, and a managed node group.
+* Learn AWS Deep Learning AMIs: choosing an AMI and instance, launching, Jupyter, Conda, GPU monitoring, and upgrading a DLAMI.
 
 ### Tasks to be carried out this week:
-| Day | Task                                                                                                                                                                                                   | Start Date | Completion Date | Reference Material                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | --------------- | ----------------------------------------- |
-| 2   | - Get acquainted with FCAJ members <br> - Read and take note of internship unit rules and regulations                                                                                                   | 08/11/2025 | 08/11/2025      |
-| 3   | - Learn about AWS and its types of services <br>&emsp; + Compute <br>&emsp; + Storage <br>&emsp; + Networking <br>&emsp; + Database <br>&emsp; + ... <br>                                              | 08/12/2025 | 08/12/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 4   | - Create AWS Free Tier account <br> - Learn about AWS Console & AWS CLI <br> - **Practice:** <br>&emsp; + Create AWS account <br>&emsp; + Install & configure AWS CLI <br> &emsp; + How to use AWS CLI | 08/13/2025 | 08/13/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 5   | - Learn basic EC2: <br>&emsp; + Instance types <br>&emsp; + AMI <br>&emsp; + EBS <br>&emsp; + ... <br> - SSH connection methods to EC2 <br> - Learn about Elastic IP   <br>                            | 08/14/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
-| 6   | - **Practice:** <br>&emsp; + Launch an EC2 instance <br>&emsp; + Connect via SSH <br>&emsp; + Attach an EBS volume                                                                                     | 08/15/2025 | 08/15/2025      | <https://cloudjourney.awsstudygroup.com/> |
 
+| Day | Task | Start Date | Completion Date | Reference Material |
+| --- | --- | --- | --- | --- |
+| Tue | - Read the What is Amazon EKS? chapter: EKS standard (AWS manages the control plane) and EKS Auto Mode (AWS also manages nodes), plus EKS Capabilities Argo CD, ACK, and kro <br> - Reviewed Kubernetes: the declarative model, the reconciliation loop, the control plane (API server, etcd, scheduler, controller manager), and worker nodes (kubelet, kube-proxy, container runtime) <br> - Studied the main objects: Pod, Deployment, Service, Ingress, ConfigMap, Secret, PV/PVC, StorageClass, Namespace <br> - Read common use cases, architecture (2 API servers and 3 etcd instances across 3 AZs, 6 compute options), and deployment options (Regions, Local Zones, Hybrid Nodes, Outposts, EKS Anywhere) <br> - Checked the environment with `uname -sm` and `aws --version`: running in CloudShell, AWS CLI v2 preinstalled, no access key needed <br> - `aws sts get-caller-identity` returned `:root`. Created IAM user `lit-admin` with `AdministratorAccess`, turned on IAM access to Billing, enabled MFA on root, and signed back in as `lit-admin` <br> - Installed eksctl `0.231.0` into `~/bin` and added it to PATH in `~/.bashrc` so it survives CloudShell restarts <br> - Fixed `msiexec.exe: command not found` (a Windows-only command) by confirming the CLI was already in CloudShell | 11/03/2026 | 11/03/2026 | <https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html> |
+| Wed | - Wrote `cluster-config.yaml` for cluster `web-quickstart` in `ap-southeast-1` with `autoModeConfig: enabled: true` <br> - Ran `eksctl create cluster -f cluster-config.yaml`. eksctl built a 3-AZ VPC through stack `eksctl-web-quickstart-cluster`, the control plane was ready after about 12 minutes, and it added the `metrics-server` add-on <br> - Auto Mode created 2 nodes to run the 2 `metrics-server` Pods; node names are EC2 instance IDs <br> - Fixed the version skew warning (client 1.36, server 1.34) by downloading kubectl 1.34 into `~/bin` and running `hash -r` <br> - Created IngressClass `alb` with controller `eks.amazonaws.com/alb`, namespace `game-2048`, then applied the 2048 manifest: a 5-replica Deployment, Service `service-2048`, and Ingress `ingress-2048` <br> - Pods went from Pending to Running, the Service had all 5 endpoints, and the game opened at the ALB address <br> - Created StorageClass `auto-ebs-sc` (gp3, encrypted, `WaitForFirstConsumer`), PVC `game-data-pvc` 10Gi, and updated the Deployment to mount the volume at `/var/lib/2048` with 1 replica to avoid a Multi-Attach error on the ReadWriteOnce volume <br> - The rolling update kept 1 old Pod until the new Pod was Running. The PVC went to Bound and the PV had reclaim policy `Delete`. Auto Mode removed the spare node <br> - Cleaned up: `kubectl delete namespace game-2048`, then `eksctl delete cluster -f ./cluster-config.yaml --wait`. Confirmed no cluster, NAT Gateway, Load Balancer, or EBS volume remained | 11/04/2026 | 11/04/2026 | <https://docs.aws.amazon.com/eks/latest/userguide/quickstart.html> |
+| Thu | - Read Learn Amazon EKS (EKS Workshop, hands-on tutorials, EKS Samples) and compared 3 ways to create a cluster: Auto Mode, eksctl, and Console + AWS CLI <br> - Created the VPC as stack `my-eks-vpc-stack` from template `amazon-eks-vpc-private-subnets.yaml` and waited with `aws cloudformation wait stack-create-complete` <br> - Wrote a trust policy for `eks.amazonaws.com`, created role `myAmazonEKSClusterRole`, and attached `AmazonEKSClusterPolicy` <br> - Created cluster `my-cluster` in the Console: Custom configuration, EKS Auto Mode off, Kubernetes 1.35, Standard upgrade policy, bootstrap admin access Allow, and the stack's VPC, subnets, and `ControlPlaneSecurityGroup` <br> - Ran `aws eks update-kubeconfig`. Client 1.36 and server 1.35.9 were within skew; `kubectl get svc` returned the `kubernetes` service (ClusterIP `10.100.0.1`); `kubectl get nodes` returned `No resources found` because there were no nodes yet <br> - Wrote a trust policy for `ec2.amazonaws.com`, created role `myAmazonEKSNodeRole` with `AmazonEKSWorkerNodePolicy`, `AmazonEC2ContainerRegistryReadOnly`, and `AmazonEKS_CNI_Policy`, then created managed node group `my-nodegroup` <br> - Cleaned up in order: node group, cluster, VPC stack, detached policies and deleted both IAM roles, removed the context from kubeconfig. The final check showed only the service-linked role `AWSServiceRoleForAmazonEKS` | 11/05/2026 | 11/05/2026 | <https://docs.aws.amazon.com/eks/latest/userguide/getting-started-console.html> |
+| Fri | - Studied AWS Deep Learning AMIs: AMIs with NVIDIA driver, CUDA, cuDNN, PyTorch, and TensorFlow preinstalled, for EC2 from CPU-only to multi-GPU <br> - Compared the Deep Learning AMI with Conda (one Conda environment per framework) and the Deep Learning Base AMI (build frameworks from source). OS options: Ubuntu 20.04, 22.04, Amazon Linux 2, Amazon Linux 2023 <br> - Learned how to choose an instance: GPU, CPU, Inferentia (inference), Trainium (training), G5g (ARM64), and EFA for multi-node training. The DLAMI is free and you pay only for EC2; the NVIDIA driver may be used only on instances with NVIDIA hardware <br> - Found a DLAMI ID with `aws ssm get-parameter --name /aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-ubuntu-22.04/latest/ami-id` or `aws ec2 describe-images --owners amazon` <br> - Learned how to launch an instance from the EC2 Console or with `aws ec2 run-instances`, and connect over SSH (user `ubuntu` or `ec2-user`) <br> - Learned the Jupyter setup: set a password, start the server, open an SSH tunnel, and log in through `localhost` instead of exposing the port to the internet | 11/06/2026 | 11/06/2026 | <https://docs.aws.amazon.com/dlami/latest/devguide/what-is-dlami.html> |
+| Sat | - Learned how to use Conda on the DLAMI: the MOTD lists environments and CUDA versions; activate with `source activate pytorch_p310` or `tensorflow2_p310`; check with `torch.rand(5, 3)` in ipython <br> - Freed disk space with `conda env list` and `conda env remove --name <env_name>` <br> - Learned GPU monitoring: `nvidia-smi`, `gpumon.py` sending metrics to CloudWatch, NVML (`pynvml`), and NVIDIA DCGM <br> - Read advanced topics: distributed training with EFA, Inferentia and Trainium with AWS Neuron, and the ARM64 DLAMI <br> - Learned how to upgrade a DLAMI: move datasets and checkpoints to an EBS volume, attach it to a new DLAMI instance in the same Availability Zone, then terminate the old instance <br> - Notes: the guide's `tf.Session()` example is a TensorFlow 1.x API that does not run on TF2; the guide's environment removal command prints `–-name`, which must be `--name`; GPU instances are expensive and may be limited by vCPU quota | 11/07/2026 | 11/07/2026 | <https://docs.aws.amazon.com/dlami/latest/devguide/tutorial-conda.html> |
 
 ### Week 8 Achievements:
 
-* Understood what AWS is and mastered the basic service groups: 
-  * Compute
-  * Storage
-  * Networking 
-  * Database
-  * ...
+* Understood the Kubernetes and Amazon EKS architecture, the difference between EKS standard and EKS Auto Mode, and the compute and deployment options.
 
-* Successfully created and configured an AWS Free Tier account.
+* Set up a safe CloudShell environment with IAM user `lit-admin`, AWS CLI, kubectl, and eksctl, and learned to fix version skew between kubectl and the cluster.
 
-* Became familiar with the AWS Management Console and learned how to find, access, and use services via the web interface.
+* Created an EKS Auto Mode cluster, deployed an app through a Deployment, Service, and Ingress with an auto-provisioned ALB, and stored data through a StorageClass, PVC, and PV on EBS.
 
-* Installed and configured AWS CLI on the computer, including:
-  * Access Key
-  * Secret Key
-  * Default Region
-  * ...
+* Watched Auto Mode create and remove nodes on its own, and saw a rolling update finish without downtime.
 
-* Used AWS CLI to perform basic operations such as:
+* Built a cluster without Auto Mode: a VPC from CloudFormation, a cluster role, a node role with 3 policies, and a managed node group.
 
-  * Check account & configuration information
-  * Retrieve the list of regions
-  * View EC2 service
-  * Create and manage key pairs
-  * Check information about running services
-  * ...
+* Learned how to pick a DLAMI and instance for deep learning, the launch flow, Jupyter over an SSH tunnel, Conda, GPU monitoring, and upgrading a DLAMI with EBS.
 
-* Acquired the ability to connect between the web interface and CLI to manage AWS resources in parallel.
-* ...
+* Cleaned up every resource after each lab in dependency order and confirmed nothing billable was left.
