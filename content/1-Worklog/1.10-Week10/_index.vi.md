@@ -24,6 +24,18 @@ pre: " <b> 1.10. </b> "
 | 6 | - Đọc Get started with Amazon Redshift Serverless: namespace (dữ liệu) và workgroup (tài nguyên tính toán) <br> - Tạo workgroup với cấu hình mặc định, hiểu đơn vị RPU và cơ chế tính phí theo thời gian truy vấn <br> - Mở query editor v2, nạp dữ liệu mẫu có sẵn và chạy các truy vấn SQL mẫu <br> - Tìm hiểu lệnh `COPY` để nạp dữ liệu từ S3 và Redshift Spectrum để truy vấn bảng trong Data Catalog <br> - So sánh Redshift (data warehouse) với Athena (query trực tiếp trên S3) <br> - Clean up: xóa workgroup và namespace để không phát sinh phí | 20/11/2026 | 20/11/2026 | <https://docs.aws.amazon.com/redshift/latest/gsg/new-user-serverless.html> |
 | 7 | - Đọc Getting started với Amazon Quick Sight (nay thuộc Amazon Quick Suite): dataset, analysis, visual, dashboard <br> - Kiểm tra gói đăng ký và chi phí trước khi đăng ký Quick Sight <br> - Làm tutorial tạo analysis từ dữ liệu mẫu: thêm visual dạng cột, đường và bảng, thêm filter <br> - Publish analysis thành dashboard và tìm hiểu cách chia sẻ cho người dùng khác <br> - Tìm hiểu cách kết nối Quick Sight với Athena làm nguồn dữ liệu <br> - Clean up: xóa dataset, analysis, dashboard và hủy đăng ký nếu không dùng tiếp | 21/11/2026 | 21/11/2026 | <https://docs.aws.amazon.com/quicksight/latest/user/getting-started.html> |
 
+### Vướng mắc và lưu ý tuần 10:
+
+* Crawler báo lỗi không đọc được S3 nếu IAM role thiếu quyền trên bucket: role cần policy `AWSGlueServiceRole` cùng quyền đọc prefix chứa dữ liệu.
+
+* Crawler tạo nhiều bảng thay vì một bảng khi các thư mục con có schema khác nhau: cần tổ chức dữ liệu theo một prefix cho mỗi bảng.
+
+* Sau khi bật Lake Formation, người dùng cần cả quyền IAM lẫn quyền Lake Formation mới truy vấn được. Thu hồi quyền mặc định của `IAMAllowedPrincipals` có thể làm mất quyền truy cập các bảng đang dùng.
+
+* Redshift Serverless tính phí theo RPU-giờ, mỗi lần chạy tối thiểu 60 giây: phải xóa cả workgroup và namespace sau lab, xóa workgroup thôi là chưa đủ.
+
+* Quick Sight báo access denied khi đọc dữ liệu Athena nếu chưa cấp quyền truy cập Athena và bucket S3 trong phần Security & permissions của Quick Sight.
+
 ### Kết quả đạt được tuần 10:
 
 * Hiểu cách Glue crawler tự suy ra schema và đưa metadata vào Data Catalog dùng chung cho các dịch vụ phân tích.

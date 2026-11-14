@@ -24,6 +24,18 @@ pre: " <b> 1.10. </b> "
 | Fri | - Read Get started with Amazon Redshift Serverless: the namespace (data) and the workgroup (compute) <br> - Created a workgroup with default settings, and learned RPUs and billing based on query time <br> - Opened query editor v2, loaded the built-in sample data, and ran the sample SQL queries <br> - Studied the `COPY` command for loading data from S3 and Redshift Spectrum for querying Data Catalog tables <br> - Compared Redshift (data warehouse) with Athena (direct queries on S3) <br> - Cleaned up: deleted the workgroup and namespace to stop charges | 11/20/2026 | 11/20/2026 | <https://docs.aws.amazon.com/redshift/latest/gsg/new-user-serverless.html> |
 | Sat | - Read Getting started with Amazon Quick Sight (now part of Amazon Quick Suite): datasets, analyses, visuals, dashboards <br> - Checked the subscription plan and cost before signing up for Quick Sight <br> - Followed the tutorial to create an analysis from sample data: added bar, line, and table visuals, and a filter <br> - Published the analysis as a dashboard and learned how to share it with other users <br> - Studied connecting Quick Sight to Athena as a data source <br> - Cleaned up: deleted the dataset, analysis, and dashboard, and cancelled the subscription if no longer needed | 11/21/2026 | 11/21/2026 | <https://docs.aws.amazon.com/quicksight/latest/user/getting-started.html> |
 
+### Week 10 Issues and Notes:
+
+* A crawler cannot read S3 if its IAM role lacks bucket access: the role needs `AWSGlueServiceRole` plus read access to the data prefix.
+
+* A crawler creates several tables instead of one when subfolders have different schemas: organize data under one prefix per table.
+
+* With Lake Formation on, a user needs both IAM and Lake Formation permissions to query. Revoking the default `IAMAllowedPrincipals` permission can break access to tables already in use.
+
+* Redshift Serverless bills by RPU-hour with a 60-second minimum per run: delete both the workgroup and the namespace after the lab, not only the workgroup.
+
+* Quick Sight returns access denied on Athena data until Athena and the S3 bucket are allowed under Quick Sight's Security & permissions settings.
+
 ### Week 10 Achievements:
 
 * Understood how a Glue crawler infers a schema and stores metadata in the Data Catalog shared by analytics services.

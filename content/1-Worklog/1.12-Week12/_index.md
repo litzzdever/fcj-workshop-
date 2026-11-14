@@ -26,6 +26,20 @@ pre: " <b> 1.12. </b> "
 | Sat | - Followed the AWS Organizations tutorial: created an organization and learned the management account, member accounts, and organizational units (OUs) <br> - Studied service control policies (SCPs) that cap the permissions of accounts in an OU, such as blocking use outside allowed regions <br> - Read Enable IAM Identity Center: created users, groups, and permission sets, assigned access to accounts, and signed in through the AWS access portal instead of long-lived IAM users <br> - Created a monthly cost budget in AWS Budgets with email alerts when actual or forecasted cost passes a threshold <br> - Cleaned up: deleted the test users and permission sets | 12/12/2026 | 12/12/2026 | <https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tutorials_basic.html> |
 | Mon | - Reviewed the 12 weeks: organized the service groups studied (compute, storage, database, serverless, containers, analytics, AI/ML, DevOps, security, governance) <br> - Audited the account in every region used: EC2, EBS, Elastic IP, NAT Gateway, Load Balancer, RDS, Redshift, Kinesis, CloudFormation stacks, S3 buckets <br> - Checked Billing and Cost Explorer to confirm no unexpected charges remained <br> - Updated the worklog and noted the labs to redo or study in more depth | 12/14/2026 | 12/14/2026 | <https://docs.aws.amazon.com/cost-management/latest/userguide/create-cost-budget.html> |
 
+### Week 12 Issues and Notes:
+
+* CodeBuild looks for `buildspec.yml` at the repo root by default. The service role needs write access to the artifact bucket, or the build fails at the artifact upload step.
+
+* A GitHub connection in CodePipeline is created in Pending status: finish the GitHub authorization in the console before the pipeline can run.
+
+* A KMS key cannot be deleted right away: it can only be scheduled for deletion with a 7 to 30 day waiting period, during which the key is unusable but the deletion can be cancelled.
+
+* A web ACL for CloudFront must be created with Global scope (us-east-1). AWS WAF attaches to API Gateway REST APIs but not to HTTP APIs.
+
+* Security Hub CSPM needs AWS Config recording to run its security controls. Config charges per configuration item recorded, so stop the recorder after the lab.
+
+* IAM Identity Center can be enabled in only one region per organization, so choose the region first. The account that creates the organization becomes the management account.
+
 ### Week 12 Achievements:
 
 * Understood CI/CD on AWS: CodeBuild runs builds from `buildspec.yml`, and CodePipeline automates the flow from source to deploy.

@@ -24,6 +24,18 @@ pre: " <b> 1.9. </b> "
 | Fri | - Studied Amazon Data Firehose (formerly Kinesis Data Firehose): delivers streaming data to a destination without writing your own consumer <br> - Created a Firehose stream with Direct PUT or Kinesis Data Streams as the source and an S3 bucket as the destination <br> - Configured buffering (size and interval) and a time-based prefix for S3 objects <br> - Studied record transformation with Lambda and format conversion to Parquet <br> - Sent test records and checked that files appeared in S3 after the buffer interval <br> - Cleaned up: deleted the Firehose stream, then emptied and deleted the S3 bucket | 11/13/2026 | 11/13/2026 | <https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html> |
 | Sat | - Read the Amazon Athena Get started guide: query data in S3 directly with SQL, with no servers to manage <br> - Set the query result location in S3 for the workgroup <br> - Followed the tutorial: created a database, created a table over sample data with `CREATE EXTERNAL TABLE`, ran a `SELECT` query, and reviewed the results <br> - Learned that Athena charges by data scanned, and why partitions and columnar formats (Parquet) lower the cost <br> - Linked back to Friday: planned to use Athena to query the data Firehose writes to S3 <br> - Cleaned up: dropped the table and database and deleted query results in S3 | 11/14/2026 | 11/14/2026 | <https://docs.aws.amazon.com/athena/latest/ug/getting-started.html> |
 
+### Week 9 Issues and Notes:
+
+* The Lambda function in a Task state fails with AccessDenied if the state machine's IAM role lacks `lambda:InvokeFunction`: add a policy for the function's ARN.
+
+* Kinesis `get-records` returns nothing when the shard iterator type is `LATEST` and the records were put earlier: use `TRIM_HORIZON` to read from the start. A shard iterator is valid for only 5 minutes, so get a new one when it expires.
+
+* AWS CLI v2 treats `--data` as base64 by default: add `--cli-binary-format raw-in-base64-out` when sending plain strings with `put-record`.
+
+* Firehose files do not appear in S3 right away because Firehose waits for the buffer size or buffer interval. JSON records run together if the producer adds no newline, and Athena then reads them incorrectly.
+
+* Athena needs a query result location before the first query. A table's `LOCATION` must point to an S3 prefix (folder), not to a single file.
+
 ### Week 9 Achievements:
 
 * Understood how Step Functions coordinates multiple steps as a workflow, and the difference between Standard and Express workflows.

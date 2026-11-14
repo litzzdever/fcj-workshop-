@@ -24,6 +24,18 @@ pre: " <b> 1.11. </b> "
 | Fri | - Followed the Amazon Transcribe tutorial in the console and AWS CLI: uploaded an audio file to S3, ran `start-transcription-job`, and read the transcript JSON <br> - Studied automatic language identification, speaker diarization, and custom vocabulary <br> - Read How Amazon Polly works: voices, engines (standard, neural), output formats, and SSML <br> - Practiced `synthesize-speech` to create an MP3 from text and used SSML to adjust speed and pauses <br> - Cleaned up: deleted the transcription job, the audio file, and the transcript in S3 | 11/27/2026 | 11/27/2026 | <https://docs.aws.amazon.com/transcribe/latest/dg/getting-started-cli.html> |
 | Sat | - Read Amazon Lex V2 core concepts: bot, locale, intent, utterance, slot, slot type, fulfillment <br> - Did Exercise 1: created a chatbot from a template, built it, and tested the conversation in the Test window <br> - Added a new intent and slot, and configured a prompt that asks again when information is missing <br> - Studied Lambda integration for fulfillment, and bot versions and aliases <br> - Compared Lex (intent-based conversation) with the RAG chatbot on OpenSearch and Bedrock from weeks 3 and 6 <br> - Cleaned up: deleted the bot and the lab IAM role | 11/28/2026 | 11/28/2026 | <https://docs.aws.amazon.com/lexv2/latest/dg/exercise-1.html> |
 
+### Week 11 Issues and Notes:
+
+* Rekognition limits image size (5 MB as bytes, 15 MB from S3), and the S3 bucket must be in the same region as the API call.
+
+* Textract's synchronous APIs handle only images or single-page PDFs. Multi-page PDFs need the asynchronous APIs (`StartDocumentTextDetection`, `StartDocumentAnalysis`).
+
+* Comprehend does not support sentiment analysis for Vietnamese: translate to English with Translate first, then analyze.
+
+* Polly has no Vietnamese voice, so testing used English text. Not every voice supports the neural engine.
+
+* Transcribe media files must be in S3 in the same region as the job. In Lex V2, every change to an intent or slot needs a new Build before the Test window picks it up.
+
 ### Week 11 Achievements:
 
 * Learned when to use ready-made AI services and when SageMaker is needed to train a custom model.

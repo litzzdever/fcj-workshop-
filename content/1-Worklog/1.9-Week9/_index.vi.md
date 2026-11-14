@@ -24,6 +24,18 @@ pre: " <b> 1.9. </b> "
 | 6 | - Tìm hiểu Amazon Data Firehose (tên cũ Kinesis Data Firehose): dịch vụ đưa dữ liệu streaming tới đích mà không cần tự viết consumer <br> - Tạo Firehose stream với source Direct PUT hoặc Kinesis Data Streams và destination là bucket S3 <br> - Cấu hình buffering (kích thước và thời gian) và prefix theo thời gian cho object trên S3 <br> - Tìm hiểu tùy chọn biến đổi bản ghi bằng Lambda và chuyển đổi định dạng sang Parquet <br> - Gửi bản ghi thử và kiểm tra file xuất hiện trên S3 sau khi hết thời gian buffer <br> - Clean up: xóa Firehose stream, làm trống và xóa bucket S3 | 13/11/2026 | 13/11/2026 | <https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html> |
 | 7 | - Đọc Get started của Amazon Athena: truy vấn trực tiếp dữ liệu trên S3 bằng SQL, không cần dựng server <br> - Cấu hình query result location trên S3 cho workgroup <br> - Làm tutorial: tạo database, tạo bảng trên dữ liệu mẫu bằng `CREATE EXTERNAL TABLE`, chạy truy vấn `SELECT` và xem kết quả <br> - Hiểu cách tính phí theo lượng dữ liệu được quét và lý do nên dùng partition, định dạng cột (Parquet) để giảm chi phí <br> - Nối với ngày trước: định hướng dùng Athena để truy vấn dữ liệu do Firehose ghi vào S3 <br> - Clean up: xóa bảng, database và kết quả truy vấn trên S3 | 14/11/2026 | 14/11/2026 | <https://docs.aws.amazon.com/athena/latest/ug/getting-started.html> |
 
+### Vướng mắc và lưu ý tuần 9:
+
+* Hàm Lambda trong state Task báo lỗi AccessDenied nếu IAM role của state machine chưa có quyền `lambda:InvokeFunction`: cần thêm policy cho đúng ARN của hàm.
+
+* `get-records` của Kinesis trả về rỗng khi lấy shard iterator kiểu `LATEST` sau lúc đã `put-record`: dùng `TRIM_HORIZON` để đọc từ đầu stream. Shard iterator chỉ có hiệu lực 5 phút nên phải lấy lại khi hết hạn.
+
+* AWS CLI v2 mặc định coi tham số `--data` là base64: thêm `--cli-binary-format raw-in-base64-out` khi gửi chuỗi thường bằng `put-record`.
+
+* File của Firehose không xuất hiện ngay trên S3 vì Firehose chờ đủ buffer size hoặc buffer interval. Các bản ghi JSON bị dính liền nhau nếu producer không thêm ký tự xuống dòng, khiến Athena đọc sai.
+
+* Athena yêu cầu đặt query result location trước truy vấn đầu tiên. `LOCATION` của bảng phải trỏ tới một prefix (thư mục) trên S3, không trỏ tới một file.
+
 ### Kết quả đạt được tuần 9:
 
 * Hiểu cách Step Functions điều phối nhiều bước thành workflow, và khác biệt giữa Standard workflow và Express workflow.

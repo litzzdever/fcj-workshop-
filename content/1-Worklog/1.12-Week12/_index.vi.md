@@ -26,6 +26,20 @@ pre: " <b> 1.12. </b> "
 | 7 | - Làm tutorial AWS Organizations: tạo organization, hiểu management account, member account, organizational unit (OU) <br> - Tìm hiểu service control policy (SCP) để giới hạn quyền tối đa của tài khoản trong OU, ví dụ chặn sử dụng ngoài region cho phép <br> - Đọc Enable IAM Identity Center: tạo user, group, permission set và gán quyền vào tài khoản, đăng nhập qua AWS access portal thay cho IAM user lâu dài <br> - Tạo cost budget hằng tháng trong AWS Budgets với ngưỡng cảnh báo gửi email khi chi phí thực tế hoặc dự báo vượt mức <br> - Clean up: xóa user và permission set thử nghiệm | 12/12/2026 | 12/12/2026 | <https://docs.aws.amazon.com/organizations/latest/userguide/orgs_tutorials_basic.html> |
 | 2 | - Tổng kết 12 tuần: hệ thống lại các nhóm dịch vụ đã học (compute, storage, database, serverless, container, analytics, AI/ML, DevOps, security, governance) <br> - Rà soát toàn bộ tài khoản ở các region đã dùng: EC2, EBS, Elastic IP, NAT Gateway, Load Balancer, RDS, Redshift, Kinesis, CloudFormation stack, bucket S3 <br> - Kiểm tra Billing và Cost Explorer để xác nhận không còn dịch vụ phát sinh chi phí ngoài dự kiến <br> - Cập nhật lại worklog và ghi chú những bài lab cần làm lại hoặc tìm hiểu sâu hơn | 14/12/2026 | 14/12/2026 | <https://docs.aws.amazon.com/cost-management/latest/userguide/create-cost-budget.html> |
 
+### Vướng mắc và lưu ý tuần 12:
+
+* CodeBuild mặc định tìm file `buildspec.yml` ở thư mục gốc của repo. Service role cần quyền ghi vào bucket artifact, nếu thiếu thì build lỗi ở bước upload artifact.
+
+* Connection tới GitHub trong CodePipeline được tạo ở trạng thái Pending: phải vào console hoàn tất bước xác thực với GitHub thì pipeline mới chạy được.
+
+* Không xóa ngay được KMS key: chỉ có thể lên lịch xóa với thời gian chờ 7 đến 30 ngày, và trong thời gian đó key không dùng được nhưng có thể hủy lịch xóa.
+
+* Web ACL dùng cho CloudFront phải tạo ở phạm vi Global (us-east-1). AWS WAF gắn được vào REST API của API Gateway nhưng không gắn được vào HTTP API.
+
+* Security Hub CSPM cần AWS Config đang ghi cấu hình để chạy các security control. Config tính phí theo số configuration item được ghi, nên phải dừng recorder sau lab.
+
+* IAM Identity Center chỉ bật được ở một region cho mỗi organization, nên cần chọn region trước. Tài khoản tạo organization trở thành management account.
+
 ### Kết quả đạt được tuần 12:
 
 * Hiểu luồng CI/CD trên AWS: CodeBuild chạy build theo `buildspec.yml`, CodePipeline tự động hóa từ source đến deploy.
