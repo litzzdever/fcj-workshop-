@@ -1,27 +1,55 @@
 ---
 title: "Blog 1"
-date: 2024-01-01
+date: 2026-11-01
 weight: 1
 chapter: false
 pre: " <b> 3.1. </b> "
 ---
-# SESSION POLICIES TRONG AMAZON EKS POD IDENTITY
 
-Amazon EKS Pod Identity vừa bổ sung tính năng session policies, cho phép bạn thu hẹp quyền IAM một cách linh hoạt và chính xác cho từng pod mà không cần tạo thêm nhiều IAM roles riêng biệt. Đây là bước tiến quan trọng giúp áp dụng nguyên tắc least privilege hiệu quả hơn trong môi trường Kubernetes quy mô lớn.
+# AMAZON SAGEMAKER AI – AWS GIÚP AI ENGINEER TRAIN, TUNE VÀ DEPLOY MODEL NHƯ THẾ NÀO?
 
-Các điểm chính cần nắm:
+*Đăng ngày 01/11/2026 trên nhóm AWS Study Group – [Xem bài viết gốc](https://www.facebook.com/photo/?fbid=4660995990851052&set=gm.2322852158479743&idorvanity=660548818043427)*
 
-* Session policy là một IAM policy inline được chỉ định khi tạo hoặc cập nhật Pod Identity association.
-* Quyền hiệu quả = intersection (giao) giữa permissions của IAM role và session policy → session policy chỉ có thể thu hẹp, không thể mở rộng quyền.
-* Giúp tránh tình trạng over-permissioning khi reuse chung một IAM role cho nhiều workloads có nhu cầu khác nhau.
-* Hỗ trợ cả same-account và cross-account (qua IAM role chaining).
-* Giảm đáng kể số lượng IAM roles cần quản lý, tránh chạm giới hạn quota IAM trong cluster lớn.
-* Cấu hình dễ dàng qua AWS Management Console, AWS CLI hoặc AWS SDK khi tạo association giữa Kubernetes ServiceAccount và IAM role.
+Model chạy tốt trên notebook chưa có nghĩa là đã sẵn sàng cho thực tế: AI engineer còn phải lo GPU để train, tinh chỉnh model, chọn cấu hình deploy và theo dõi model sau khi vận hành.
 
-Tính năng này đặc biệt hữu ích khi bạn có nhiều ứng dụng chạy trên cùng một IAM role nhưng cần giới hạn quyền khác nhau (ví dụ: một pod chỉ đọc S3 bucket cụ thể, pod khác chỉ gọi một số API nhất định).
+**Ví dụ:** Bạn fine-tune một model chatbot, cần train trên GPU, chọn instance để deploy, rồi theo dõi độ trễ khi nhiều người dùng gọi cùng lúc.
 
-...Hình ảnh...
+Thay vì tự dựng hạ tầng, AWS cung cấp **Amazon SageMaker AI**, dịch vụ machine learning được quản lý toàn phần, gom chuẩn bị dữ liệu, train, tune, deploy và giám sát vào một nền tảng.
 
-...Link...
+![Vòng đời model trên Amazon SageMaker AI: Data, Train, Tune, Deploy](/images/3-BlogsPosted/3.1-Blog1/sagemaker-ai-lifecycle.png)
 
-...Hướng dẫn...
+### Amazon SageMaker AI có gì đáng chú ý?
+
+- **Feature Store:** lưu và chia sẻ feature cho training và inference; từ 9/2026 cập nhật được từng feature riêng lẻ trong record.
+- **Train linh hoạt:** instance preference list cho phép khai báo nhiều loại instance theo thứ tự ưu tiên; kèm elastic training, checkpointless training và MLflow serverless.
+- **Tune nhanh hơn:** serverless model customization hỗ trợ SFT, DPO, RLAIF; từ 5/2026 có agentic experience đi từ định nghĩa bài toán đến deploy.
+- **Chọn cấu hình deploy:** inference recommendations benchmark bằng NVIDIA AIPerf theo mục tiêu chi phí, độ trễ hoặc thông lượng.
+- **Deploy dễ tích hợp:** API tương thích OpenAI (chỉ cần đổi URL), instance pools dự phòng và container caching giúp khởi động nhanh hơn.
+- **Giám sát:** hơn 100 metric qua OpenTelemetry trên dashboard CloudWatch dựng sẵn (TTFT, ITL, GPU, autoscaling).
+
+### Các trường hợp sử dụng và lợi ích thực tế
+
+- Fine-tune LLM trên dữ liệu riêng rồi deploy lên Amazon Bedrock hoặc SageMaker endpoint.
+- Chatbot, RAG nhiều người dùng: prefix-aware routing tận dụng KV cache để giảm độ trễ.
+- Train khi GPU khan hiếm mà không phải chờ đúng một loại instance.
+- **Lợi ích:** tích hợp liền mạch với S3, IAM, VPC, CloudWatch và giảm công vận hành hạ tầng GPU.
+
+### Khi nào nên dùng và cần lưu ý gì?
+
+- **Nên dùng** khi cần đưa model từ notebook lên production trong hệ sinh thái AWS. Chạy thử nhanh model nhỏ thì máy local hoặc Colab có thể đơn giản hơn.
+- **Chi phí:** tính theo thời gian chạy instance, quên tắt space hoặc endpoint vẫn bị tính tiền. Nên đặt Budget alert và dọn tài nguyên sau khi thử.
+- **Số liệu và region:** các con số như giảm 51% thời gian khởi động là ví dụ do AWS công bố; một số tính năng chỉ có ở một số region, cần kiểm tra trước khi dùng.
+- **Lỗi hay gặp:** SDK v3 làm lệnh `import get_execution_role` bị lỗi, xử lý bằng `pip install "sagemaker<3"` rồi restart kernel.
+
+### Kết luận
+
+Amazon SageMaker AI bao trọn vòng đời model, từ dữ liệu, train, tune, deploy đến giám sát, giúp AI engineer đưa model lên production mà không phải tự quản lý hạ tầng GPU. Đây là dịch vụ đáng tìm hiểu khi nhu cầu fine-tune và triển khai LLM ngày càng tăng.
+
+### Nguồn tham khảo
+
+1. AWS – Amazon SageMaker AI: <https://aws.amazon.com/vi/sagemaker-ai/>
+2. AWS – SageMaker Developer Guide: <https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html>
+3. AWS – SageMaker Inference 2026 launches in review: <https://aws.amazon.com/blogs/machine-learning/amazon-sagemaker-inference-2026-year-to-date-launches-in-review/>
+4. AWS – Instance preference lists: <https://aws.amazon.com/about-aws/whats-new/2026/09/amazon-sagemaker-training-processing-instance-pref-lists/>
+
+`#AWS` `#AmazonSageMakerAI` `#MLOps` `#GenerativeAI` `#AWSStudyGroupVN` `#FCAJ`
