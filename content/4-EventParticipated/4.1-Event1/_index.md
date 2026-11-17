@@ -148,5 +148,5 @@ Attending the session on **29/09/2026** made it clear that enterprise AI is no l
 
 #### Event photos
 
-![Attending the AWS event on 29/09/2026](event-29-09-photo.jpg)
+![Attending the AWS event on 29/09/2026](https://raw.githubusercontent.com/litzzdever/fcj-workshop-/main/content/4-EventParticipated/4.1-Event1/event-29-09-photo.jpg)
 
