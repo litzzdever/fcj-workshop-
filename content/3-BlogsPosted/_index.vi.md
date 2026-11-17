@@ -14,5 +14,5 @@ Tại đây liệt kê các bài blog tôi đã đăng trên nhóm [AWS Study Gr
 ###  [Blog 2 - Amazon Athena kết hợp AWS Glue Data Catalog – Truy vấn dữ liệu trong S3 bằng SQL mà không cần máy chủ](3.2-Blog2/)
 *Đăng ngày 11/11/2026.* Bài viết tìm hiểu cách Glue Data Catalog lưu metadata còn Athena chạy SQL trực tiếp trên dữ liệu S3 và tính phí theo lượng dữ liệu quét. Thử nghiệm với 1.000.000 dòng dữ liệu bán hàng mô phỏng cho thấy chuyển CSV sang Parquet và chia partition theo tháng giúp giảm lượng dữ liệu quét từ khoảng 11 đến khoảng 1.300 lần tùy truy vấn, kèm các lưu ý về partition, kích thước tệp và kiểm soát chi phí.
 
-###  [Blog 3 - ...](3.3-Blog3/)
-Blog này giới thiệu Amazon EKS Pod Identity vừa bổ sung tính năng session policies, cho phép bạn thu hẹp quyền IAM một cách linh hoạt và chính xác cho từng pod mà không cần tạo thêm nhiều IAM roles riêng biệt. Đây là bước tiến quan trọng giúp áp dụng nguyên tắc least privilege hiệu quả hơn trong môi trường Kubernetes quy mô lớn.
+###  [Blog 3 - Amazon Rekognition kết hợp Amazon Athena – Phân tích ảnh bằng AI và truy vấn kết quả bằng SQL](3.3-Blog3/)
+*Đăng ngày 14/11/2026.* Bài viết dùng Amazon Rekognition (`DetectLabels`) để tự gắn nhãn cho 30 ảnh từ bộ dữ liệu Imagenette, lưu kết quả dạng JSON Lines trên S3 rồi thống kê bằng SQL trong Amazon Athena. Bài so sánh hai ngưỡng `MinConfidence` 80 và 55 (166 và 243 nhãn), kiểm tra độ chính xác của nhãn và nêu các lưu ý về chi phí, quyền riêng tư và IAM.

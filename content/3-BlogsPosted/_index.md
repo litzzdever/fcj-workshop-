@@ -14,5 +14,5 @@ This section lists the blogs I posted to the [AWS Study Group](https://www.faceb
 ###  [Blog 2 - Amazon Athena with the AWS Glue Data Catalog – Querying data in S3 with SQL, no servers needed](3.2-Blog2/)
 *Posted on 11/11/2026.* This blog explores how the Glue Data Catalog stores metadata while Athena runs SQL directly on S3 data and charges by data scanned. A test with 1,000,000 rows of simulated sales data shows that converting CSV to Parquet and partitioning by month cut the data scanned by about 11 to about 1,300 times depending on the query, with notes on partitioning, file size, and cost control.
 
-###  [Blog 3 - ...](3.3-Blog3/)
-This blog introduces the newly added session policies feature in Amazon EKS Pod Identity, which allows you to narrow IAM permissions flexibly and precisely for each pod without needing to create multiple separate IAM roles. This is an important step forward that helps apply the principle of least privilege more effectively in large-scale Kubernetes environments.
+###  [Blog 3 - Amazon Rekognition with Amazon Athena – Analyzing images with AI and querying the results with SQL](3.3-Blog3/)
+*Posted on 14/11/2026.* This blog uses Amazon Rekognition (`DetectLabels`) to label 30 images from the Imagenette dataset automatically, stores the results as JSON Lines in S3, and aggregates them with SQL in Amazon Athena. It compares `MinConfidence` thresholds of 80 and 55 (166 and 243 labels), checks label accuracy, and covers cost, privacy, and IAM notes.
