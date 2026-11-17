@@ -148,4 +148,4 @@ Tham dự sự kiện ngày **29/09/2026** giúp tôi thấy AI trong doanh nghi
 
 #### Một số hình ảnh khi tham gia sự kiện
 
-![Tham dự sự kiện AWS ngày 29/09/2026](event-29-09-photo.jpg)
+![Tham dự sự kiện AWS ngày 29/09/2026](https://raw.githubusercontent.com/litzzdever/fcj-workshop-/main/content/4-EventParticipated/4.1-Event1/event-29-09-photo.jpg)
