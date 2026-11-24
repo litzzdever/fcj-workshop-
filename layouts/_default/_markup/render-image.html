@@ -1,0 +1,7 @@
+{{- /* Cho phep viet anh la /static/images/... (preview local) hoac /images/...; khi build se them baseURL */ -}}
+{{- $src := .Destination -}}
+{{- $base := strings.TrimSuffix "/" site.BaseURL -}}
+{{- if hasPrefix $src "/fcj-workshop-/" -}}{{- $src = strings.TrimPrefix "/fcj-workshop-" $src -}}{{- end -}}
+{{- if hasPrefix $src "/static/" -}}{{- $src = strings.TrimPrefix "/static" $src -}}{{- end -}}
+{{- if hasPrefix $src "/" -}}{{- $src = printf "%s%s" $base $src -}}{{- end -}}
+<img src="{{ $src | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} />

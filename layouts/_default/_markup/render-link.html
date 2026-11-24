@@ -1,0 +1,5 @@
+{{- $href := .Destination -}}
+{{- $base := strings.TrimSuffix "/" site.BaseURL -}}
+{{- if hasPrefix $href "/fcj-workshop-/" -}}{{- $href = strings.TrimPrefix "/fcj-workshop-" $href -}}{{- end -}}
+{{- if hasPrefix $href "/static/" -}}{{- $href = printf "%s%s" $base (strings.TrimPrefix "/static" $href) -}}{{- end -}}
+<a href="{{ $href | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if strings.HasPrefix .Destination "http" }} target="_blank" rel="noopener"{{ end }}>{{ .Text | safeHTML }}</a>
