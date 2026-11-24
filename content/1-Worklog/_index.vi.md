@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 1. </b> "
 ---
 
-Worklog ghi lại quá trình thực tập của tôi trong chương trình **AWS First Cloud AI Journey (FCAJ)**, kéo dài **12 tuần, từ 15/09/2026 đến 14/12/2026**.
+Worklog ghi lại quá trình thực tập của tôi trong chương trình **AWS First Cloud AI Journey (FCAJ)**, kéo dài **12 tuần, từ 14/09/2026 đến 14/12/2026**.
 
 **Cách thực hiện:** Mỗi tuần tôi đặt mục tiêu, học theo workshop của AWS Study Group và tutorial chính thức trên AWS Documentation, thực hành trực tiếp trên tài khoản AWS, rồi ghi lại công việc theo từng ngày, nguồn tài liệu, lỗi gặp phải và cách xử lý. Sau mỗi bài lab, tôi dọn dẹp tài nguyên để tránh phát sinh chi phí. Song song với việc học, tôi tham gia dự án nhóm **Phụ Tùng Xe Máy Platform**, phụ trách phần chatbot RAG.
 

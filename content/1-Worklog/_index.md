@@ -6,7 +6,7 @@ chapter: false
 pre: " <b> 1. </b> "
 ---
 
-This worklog records my internship in the **AWS First Cloud AI Journey (FCAJ)** program, which ran for **12 weeks, from 15/09/2026 to 14/12/2026**.
+This worklog records my internship in the **AWS First Cloud AI Journey (FCAJ)** program, which ran for **12 weeks, from 14/09/2026 to 14/12/2026**.
 
 **How I worked:** Each week I set goals, studied AWS Study Group workshops and official tutorials in the AWS Documentation, practiced hands-on in an AWS account, and logged each day's tasks, references, errors, and fixes. After every lab I cleaned up resources to avoid charges. Alongside my studies, I worked on the team project **Phu Tung Xe May Platform**, where I was responsible for the RAG chatbot.
 
