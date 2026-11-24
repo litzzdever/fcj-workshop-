@@ -1,28 +1,28 @@
 ---
 title: "Workshop"
-date: 2024-01-01
+date: 2026-11-22
 weight: 5
 chapter: false
 pre: " <b> 5. </b> "
 ---
 
-# Đảm bảo truy cập Hybrid an toàn đến S3 bằng cách sử dụng VPC endpoint
+# Xây dựng Nền tảng Thương mại Điện tử Serverless & Chatbot AI RAG Full-Duplex trên AWS
 
 #### Tổng quan
 
-**AWS PrivateLink** cung cấp kết nối riêng tư đến các dịch vụ aws từ VPCs hoặc trung tâm dữ liệu (on-premise) mà không làm lộ lưu lượng truy cập ra ngoài public internet.
+Trong bài workshop này, bạn sẽ từng bước xây dựng và triển khai hoàn chỉnh một **Nền tảng Thương mại Điện tử Phụ tùng Xe máy hoàn toàn Serverless** kết hợp **Trợ lý ảo AI RAG thời gian thực (Full-Duplex WebSocket)** trên nền tảng AWS tại region **ap-southeast-1 (Singapore)**.
 
-Trong bài lab này, chúng ta sẽ học cách tạo, cấu hình, và kiểm tra VPC endpoints để cho phép workload của bạn tiếp cận các dịch vụ AWS mà không cần đi qua Internet công cộng.
+Toàn bộ hạ tầng được tự động hóa 100% bằng **Terraform (Infrastructure as Code)** theo chuẩn bảo mật **Least Privilege (Đặc quyền tối thiểu)** và **Event-Driven Architecture (Kiến trúc hướng sự kiện)**.
 
-Chúng ta sẽ tạo hai loại endpoints để truy cập đến Amazon S3: gateway vpc endpoint và interface vpc endpoint. Hai loại vpc endpoints này mang đến nhiều lợi ích tùy thuộc vào việc bạn truy cập đến S3 từ môi trường cloud hay từ trung tâm dữ liệu (on-premise).
-+ **Gateway** - Tạo gateway endpoint để gửi lưu lượng đến Amazon S3 hoặc DynamoDB using private IP addresses. Bạn điều hướng lưu lượng từ VPC của bạn đến gateway endpoint bằng các bảng định tuyến (route tables)
-+ **Interface** - Tạo interface endpoint để gửi lưu lượng đến các dịch vụ điểm cuối (endpoints) sử dụng Network Load Balancer để phân phối lưu lượng. Lưu lượng dành cho dịch vụ điểm cuối được resolved bằng DNS.
+Trong suốt bài lab, bạn sẽ thực hành 3 trụ cột kiến trúc hiện đại trên AWS:
++ **Serverless Web & Microservices:** Phân phối giao diện **Next.js SSR** qua **Amazon CloudFront (+ Edge WAF)**, **Amazon S3** và **AWS Lambda**; kết hợp **Amazon Cognito**, **API Gateway (REST API)** và **Amazon DynamoDB**.
++ **Event-Driven Architecture (EDA):** Tách rời các tác vụ xử lý đơn hàng bằng **Amazon EventBridge** và **Amazon SQS** (Inventory Worker trừ kho, Shipping Worker tích hợp GHN Sandbox, Notification Worker gửi email qua Gmail SMTP).
++ **Full-Duplex AI RAG Chatbot & CDC:** Xây dựng kênh chat 2 chiều thời gian thực qua **API Gateway WebSocket** với **Lambda Authorizer** xác thực JWT Cognito, tra cứu tri thức vector trên **Amazon S3** kết hợp **Google Gemini 2.0 Flash**, và đồng bộ dữ liệu tự động qua **DynamoDB Streams**.
 
 #### Nội dung
 
-1. [Tổng quan về workshop](5.1-Workshop-overview/)
-2. [Chuẩn bị](5.2-Prerequiste/)
-3. [Truy cập đến S3 từ VPC](5.3-S3-vpc/)
-4. [Truy cập đến S3 từ TTDL On-premises](5.4-S3-onprem/)
-5. [VPC Endpoint Policies (làm thêm)](5.5-Policy/)
-6. [Dọn dẹp tài nguyên](5.6-Cleanup/)
+1. [Giới thiệu & Tổng quan kiến trúc](5.1-workshop-overview/)
+2. [Điều kiện tiên quyết & Khởi tạo hạ tầng Terraform](5.2-prerequiste/)
+3. [Triển khai & Kiểm thử Frontend trên CloudFront](5.3-deploy-frontend/)
+4. [Triển khai & Kiểm thử Backend, Event-Driven và Chatbot RAG](5.4-deploy-backend/)
+5. [Dọn dẹp tài nguyên](5.5-cleanup/)

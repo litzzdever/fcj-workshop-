@@ -1,27 +1,28 @@
 ---
 title: "Workshop"
-date: 2024-01-01
+date: 2026-11-22
 weight: 5
 chapter: false
 pre: " <b> 5. </b> "
 ---
-# Secure Hybrid Access to S3 using VPC Endpoints
+
+# Building a Serverless E-Commerce Platform & Full-Duplex AI RAG Chatbot on AWS
 
 #### Overview
 
-**AWS PrivateLink** provides private connectivity to AWS services from VPCs and your on-premises networks, without exposing your traffic to the Public Internet.
+In this workshop, you will build and deploy an end-to-end **100% Serverless Motorcycle Spare Parts E-Commerce Platform** integrated with a **Real-Time Full-Duplex AI RAG Chatbot** on AWS in the **ap-southeast-1 (Singapore)** region.
 
-In this lab, you will learn how to create, configure, and test VPC endpoints that enable your workloads to reach AWS services without traversing the Public Internet.
+The entire cloud infrastructure is automated via **Terraform (Infrastructure as Code)** following **Least Privilege** security principles and **Event-Driven Architecture (EDA)** best practices.
 
-You will create two types of endpoints to access Amazon S3: a Gateway VPC endpoint, and an Interface VPC endpoint. These two types of VPC endpoints offer different benefits depending on if you are accessing Amazon S3 from the cloud or your on-premises location
-+ **Gateway** - Create a gateway endpoint to send traffic to Amazon S3 or DynamoDB using private IP addresses.You route traffic from your VPC to the gateway endpoint using route tables.
-+ **Interface** - Create an interface endpoint to send traffic to endpoint services that use a Network Load Balancer to distribute traffic. Traffic destined for the endpoint service is resolved using DNS.
+Throughout this lab, you will implement three core modern cloud pillars on AWS:
++ **Serverless Web & Microservices:** Deliver a **Next.js SSR** storefront via **Amazon CloudFront (+ Edge WAF)**, **Amazon S3**, and **AWS Lambda**; backed by **Amazon Cognito**, **API Gateway (REST API)**, and **Amazon DynamoDB**.
++ **Event-Driven Architecture (EDA):** Decouple asynchronous order fulfillment workflows using **Amazon EventBridge** and **Amazon SQS** (Inventory Worker for stock deduction, Shipping Worker integrated with GHN Sandbox, and Notification Worker sending emails via Gmail SMTP).
++ **Full-Duplex AI RAG Chatbot & CDC:** Build a real-time two-way chat channel using **API Gateway WebSocket** with a **Lambda Authorizer** verifying Cognito JWTs, in-memory vector search on **Amazon S3** powered by **Google Gemini 2.0 Flash**, and automated knowledge sync via **DynamoDB Streams**.
 
-#### Content
+#### Contents
 
-1. [Workshop overview](5.1-Workshop-overview)
-2. [Prerequiste](5.2-Prerequiste/)
-3. [Access S3 from VPC](5.3-S3-vpc/)
-4. [Access S3 from On-premises](5.4-S3-onprem/)
-5. [VPC Endpoint Policies (Bonus)](5.5-Policy/)
-6. [Clean up](5.6-Cleanup/)
+1. [Introduction & Architecture Overview](5.1-workshop-overview/)
+2. [Prerequisites & Terraform Infrastructure Provisioning](5.2-prerequiste/)
+3. [Deploy & Test Frontend on CloudFront](5.3-deploy-frontend/)
+4. [Deploy & Test Backend, Event-Driven Pipeline & RAG Chatbot](5.4-deploy-backend/)
+5. [Cleanup Resources](5.5-cleanup/)

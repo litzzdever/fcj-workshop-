@@ -1,158 +1,124 @@
 ---
 title: "Proposal"
-date: 2026-10-30
+date: 2026-11-06
 weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
 
-# Phu Tung Xe May Platform
-## A serverless motorbike parts e-commerce platform on AWS with an AI sales chatbot
+# Motorcycle E-Commerce & RAG Chatbot Platform
+## A Serverless Motorcycle Parts Store and Intelligent Advisory Chatbot on AWS
 
-Project source code: [github.com/lointt/phutungxemay-platform](https://github.com/lointt/phutungxemay-platform)
+### 1. Problem Overview
+This project addresses the challenge of advising on and retailing motorcycle parts online. The hardest part of this industry is the sheer number of part codes and motorcycle models, which makes it very easy for customers to buy the wrong part, while stores spend a lot of staff time answering chats. The system combines a Next.js e-commerce website with a RAG Chatbot (real-time part compatibility advice over WebSocket) on a 100% AWS Serverless platform. The solution automates consulting, processes orders asynchronously, provides strong security, and keeps operating costs extremely low.
 
-### 1. Executive Summary
+### 2. Objectives & Scope
+*Project Objectives*
+- **Consultation Automation:** Build a real-time RAG AI virtual assistant to verify motorcycle spare parts compatibility across specific vehicle models and production years (response latency < 2s).
+- **Cost Optimization & Scalability:** Leverage a 100% Serverless architecture on AWS, completely eliminating EC2 server maintenance overhead while maintaining operational costs below **$6 USD/month**.
+- **Asynchronous Business Processing:** Apply Event-Driven Architecture (EDA) to decouple order checkout, inventory deduction, shipping fulfillment, and email notifications.
+*Project Scope*
+- **In-Scope:**
+  - Next.js 14 SSR e-commerce web application and 5 backend Lambda microservices.
+  - Customer authentication and administrative Role-Based Access Control (RBAC) via Amazon Cognito JWT.
+  - RAG AI Chatbot cluster via WebSocket API Gateway (integrated with S3 Vector Store and Google Gemini 2.0 Flash) alongside an on-duty staff escalation mechanism (Human Handover).
+  - Integration with VNPay Sandbox online payment gateway and Giao Hàng Nhanh (GHN) Sandbox logistics fulfillment.
+  - Event-driven orchestration utilizing Amazon EventBridge, 3 SQS queues equipped with Dead Letter Queues (DLQ), and 3 background workers (Inventory, Shipping, Notification).
+  - Comprehensive Infrastructure as Code (IaC) automation via Terraform and GitHub Actions CI/CD pipelines.
+- **Out-of-Scope:** Physical retail Point-of-Sale (POS) systems for offline brick-and-mortar stores and direct international credit card payment processing (Stripe/PayPal).
 
-Phu Tung Xe May Platform is a website for genuine motorbike parts. Customers find parts by bike model, place orders, pay with VNPay or cash on delivery, track Giao Hang Nhanh (GHN) shipments, and receive confirmation emails. An AI chatbot advises on parts, answers store policy questions, checks stock, adds items to the cart, and hands over to staff when needed.
+### 3. Problem Statement
+*Current problems*
+- Customers without technical knowledge often order the wrong components/parts (wrong motorcycle model, wrong spark plug size, wrong chain and sprockets, etc.), leading to a high return rate.
+- Staff spend a lot of time repeatedly answering the same questions: does this part fit my bike, is it in stock, how much does it cost.
+- Renting fixed servers (EC2/VPS) incurs monthly maintenance costs even though traffic is uneven between day and night.
 
-The system is **100% serverless on AWS** in Singapore (`ap-southeast-1`): a Next.js 16 frontend on AWS Lambda and Amazon CloudFront, 5 Python microservices behind Amazon API Gateway, asynchronous order processing with Amazon EventBridge and Amazon SQS, data in Amazon DynamoDB, and sign-in with Amazon Cognito. All infrastructure is managed with **Terraform** and deployed automatically with **GitHub Actions**. With no always-on servers, cost grows with real traffic and stays close to zero when usage is low.
+*Solution*
+- Build the online store with Next.js 14 SSR and 5 Lambda microservices (Catalog, Cart, Order, User, Payment) behind API Gateway.
+- Integrate an AI RAG Chatbot through API Gateway WebSocket: it automatically searches for compatible parts in a vector store kept on S3 and answers customers immediately. For difficult cases or complaints, the bot automatically forwards the information (Human Requested) to staff by email.
+- Apply an event-driven architecture (EDA): EventBridge and SQS decouple inventory deduction, shipping order creation, and confirmation emails, with a DLQ to prevent the system from clogging.
+- Secure online payment through the VNPay gateway with HMAC-SHA512 digital signature verification.
 
-### 2. Problem Statement
+*Benefits and return on investment (ROI)*
+- Reduces by more than 60% the time staff spend on chat duty answering basic questions.
+- Reduces the wrong-part purchase rate to below 5%, since the bot verifies the correct motorcycle model before the customer orders.
+- Extremely low infrastructure cost thanks to the serverless architecture and the pay-as-you-go model. The expected payback period is 3–6 months.
 
-**Current problems**
+### 4. Solution Architecture
+The whole system runs on a Serverless model with no physical servers to manage. Users access the website through the CloudFront CDN; APIs are called through API Gateway REST; real-time chat goes through WebSocket; background tasks are pushed into EventBridge and SQS.
 
-- Customers struggle to find the right part for their bike; small shops usually advise manually by phone or chat.
-- After an order is placed, manual steps (reduce stock, create the shipment, send email) are error-prone, and concurrent orders can drive stock negative.
-- Renting servers that run 24/7 adds fixed cost even though a small shop's traffic is uneven.
-- An AI chatbot built on a dedicated vector database (such as Amazon OpenSearch Serverless) costs hundreds of USD per month in fixed fees, which does not fit a shop of this size.
+![Overall system architecture](/static/images/2-Proposal/AWS_Architecture.drawio.png)
 
-**The solution**
+*AWS services used*
+- *Amazon CloudFront & Functions*: CDN for delivering the website, injecting security headers, and acting as an Edge WAF that blocks XSS, SQLi, etc.
+- *AWS Lambda*: 13 functions: Next.js SSR, 5 backend microservices (Catalog, Cart, Order, User, Payment), the RAG Chatbot cluster (Chat Authorizer, Chat Receiver, Chat Orchestrator, DynamoDB Sync To S3), and 3 background workers (Inventory, Shipping, Notification).
+- *Amazon API Gateway*: Provides the REST API for the website and the WebSocket API for the real-time chatbot.
+- *Amazon DynamoDB*: Stores 6 data tables (Products, Orders, Carts, Users, StorePolicies, ChatbotSessions); Streams are enabled to automatically sync data to the AI knowledge base, and PITR backup is enabled.
+- *Amazon S3*: Stores static website files, product images, and the Chatbot's vector knowledge files.
+- *Amazon EventBridge & SQS*: Orchestrates order events and message queues, including a Dead Letter Queue (DLQ).
+- *Amazon Cognito*: Manages registration, sign-in, and customer/admin authorization using JWT.
+- *Amazon CloudWatch & SNS*: System monitoring and error alerts via email.
+- *Amazon CloudTrail*: Audit trail of edits/changes.
+- *AWS Secrets Manager*: Securely stores secret keys.
 
-- A full e-commerce website: parts catalog filtered by bike model, cart, checkout, a customer "Garage" of saved bikes, and an admin area.
-- A backend split into Lambda microservices; post-order steps run asynchronously through EventBridge and SQS with dead-letter queues (DLQs), so one failing step does not break the whole order.
-- Atomic stock updates using the DynamoDB condition `stock >= :qty`, so stock never goes negative under concurrent orders.
-- A RAG chatbot without OpenSearch: vectors are stored as JSON files in S3, loaded into Lambda memory, and refreshed automatically from DynamoDB Streams when product data changes.
+*Component design*
+- *Frontend*: S3 (images, static files) and a Next.js SSR Lambda for fast loading, supporting part search and filtering by motorcycle brand (Honda, Yamaha, etc.).
+- *Backend Microservices*: Handle adding to cart, placing orders, updating accounts, and the VNPay payment webhook.
+- *RAG Chatbot*: Receives messages over WebSocket and matches vectors on S3 to generate accurate advisory answers.
+- *Event Workers*: Lambda InventoryWorker (deducts stock), ShippingWorker (creates GHN shipping orders), NotificationWorker (sends Gmail to customers/staff).
 
-**Benefits and value**
+### 5. Technical Implementation
+*Implementation phases*
+1. *Architecture design & Terraform*: design the serverless architecture in draw.io and write IaC code to automate the entire AWS infrastructure (2 weeks).
+2. *Core Web & Microservices development*: write 5 backend Lambdas in Python 3.12, build the Next.js frontend, and integrate VNPay sandbox payment (2 weeks).
+3. *AI RAG & event-driven integration*: set up the WebSocket channel, connect EventBridge to SQS, write the background worker Lambdas, and integrate GHN sandbox shipping (2 weeks).
+4. *Security, testing & go-live*: fix security vulnerabilities, set up CloudWatch Alarms, and run tests (2 weeks).
 
-- Customers browse and buy parts 24/7; the chatbot reduces repeated questions for staff.
-- Orders flow automatically from payment to shipment and email, cutting manual work.
-- Estimated running cost is about 12–13 USD per month at medium scale (section 6), mostly for the AI model, with a budget alert in place.
-- Infrastructure as code (Terraform) rebuilds the whole environment quickly and consistently.
+*Technical requirements*
+- Use Terraform to manage infrastructure consistently and make it easy to redeploy when needed.
+- Backend written in lightweight Python 3.12 with fast startup (low cold start).
+- Apply Zero-Trust principles: verify permissions from the Cognito token, encrypt data at rest (SSE) and in transit (HTTPS/TLS).
 
-### 3. Solution Architecture
+### 6. Roadmap & Milestones
+- *Weeks 1–2*: Finalize the architecture and complete the base infrastructure with Terraform.
+- *Weeks 3–4*: Complete the backend microservices, the shopping website, and VNPay sandbox payment.
+- *Weeks 5–6*: Complete the advisory RAG chatbot, the staff handover mechanism, the SQS event queues, and GHN sandbox shipping integration.
+- *Weeks 7–8*: Security testing, cost optimization, and production launch.
 
-![Phu Tung Xe May Platform architecture](/images/2-Proposal/phutungxemay_architecture.png)
+### 7. Budget Estimation
+Costs can be viewed on the [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=a7e8011b4c42dd57ec809519002009910500eb23)
+Or see the [budget estimate file](/static/attachments/Cost_Estimate.csv).
+*Infrastructure costs (detailed estimate from the AWS spreadsheet for a scale of 1,000 users/month):*
+- *AWS Secrets Manager*: USD 1.65/month (securely manages 4 secrets: Gemini Key, VNPay, GHN, Gmail SMTP; 10,000 API calls).
+- *Amazon CloudFront*: USD 1.32/month (10 GB data transfer out, 50,000 HTTPS requests, and the Edge WAF filter).
+- *Amazon CloudWatch*: USD 1.30/month (1 GB log data ingested, 6 metric alarms, and 1 monitoring dashboard).
+- *Amazon DynamoDB*: USD 0.52/month (USD 0.29 for on-demand read/write capacity and USD 0.23 for PITR backup protecting 1 GB of data; Streams are free at USD 0).
+- *Amazon API Gateway*: USD 0.23/month (50,000 REST API requests and 20,000 WebSocket messages).
+- *S3 Standard*: USD 0.09/month (3 GB of image & vector storage, 1,000 PUT requests, and 15,000 GET requests).
+- *AWS Key Management Service (KMS)*: USD 0.03/month (10,000 symmetric requests for encrypting secret keys).
+- *AWS Lambda*: USD 0.00/month (500,000 requests, 512 MB memory, fully within the 1 million requests Free Tier allowance).
+- *Amazon Cognito*: USD 0.00/month (1,000 monthly active users (MAU), free within the 50,000 MAU Free Tier allowance).
+- *Amazon Simple Queue Service (SQS)*: USD 0.00/month (15,000 standard requests, free within the 1 million requests Free Tier).
+- *Amazon EventBridge*: USD 0.00/month (3,000 custom events within the Free Tier allowance).
+- *Amazon SNS*: USD 0.00/month (100 free email alert requests).
+- *AWS CloudTrail*: USD 0.00/month (administrative Event History for 90 days is 100% free).
+*Total cost*: **USD 5.14/month**, equivalent to **USD 61.68/12 months** (approximately **~VND 1,540,000** for a full year of operation).
 
-**Website request flow**
+### 8. Risk Assessment
+*Risk matrix*
+- Web vulnerabilities / data theft: high impact, medium probability.
+- AI giving wrong part specifications: high impact, low probability.
+- Cost spikes due to API spam: medium impact, low probability.
 
-1. The browser hits Amazon CloudFront. `/_next/*` and product images come from Amazon S3; dynamic pages are server-rendered (SSR) by a Lambda function running Next.js through the OpenNext adapter.
-2. `/api/*` passes through a CloudFront Function that strips the `/api` prefix, then reaches API Gateway REST with a Cognito Authorizer.
-3. API Gateway calls 5 microservices: Catalog, Cart, Order, Payment Webhook (VNPay IPN), and User Profile; data lives in the DynamoDB tables Products, Orders, Carts, and Users.
+*Mitigation strategies*
+- Block attacks at the edge with Edge WAF, and verify JWT tokens to prevent viewing other people's orders (IDOR protection).
+- Strictly constrain the AI prompt: only answer what is in the technical documents and never invent specifications.
+- Set rate limits on API Gateway and configure AWS Budgets cost alerts.
 
-**Order processing flow (event-driven)**
+*Contingency plans*
+- When the bot cannot handle a case, it automatically escalates to a support staff member by email, together with the customer's information.
+- The entire infrastructure is defined in Terraform files and can be fully rebuilt in another region within 15 minutes in case of an incident.
 
-1. The Order Service and Payment Webhook publish events to an EventBridge custom bus.
-2. EventBridge rules route events to 3 SQS queues, each with its own DLQ.
-3. Three workers handle them: the Inventory Worker reduces or restores stock, the Shipping Worker creates GHN API v2 shipments (normalizing Vietnamese addresses with fuzzy matching), and the Notification Worker sends HTML invoice emails through Gmail SMTP.
-
-**AI chatbot flow (RAG)**
-
-1. Customers chat over API Gateway WebSocket, authenticated with a Cognito JWT through a Lambda Authorizer.
-2. The Chat Receiver Lambda accepts the message and asynchronously invokes the Chat Orchestrator Lambda (packaged as a container image).
-3. The Orchestrator runs hybrid search (Gemini embeddings plus BM25) over the vectors in S3, reads stock and carts from DynamoDB, then calls Gemini to answer, with a fallback mode when Gemini is overloaded.
-4. When a customer needs a person, the Orchestrator publishes a `HumanHandoverRequested` event to EventBridge so the Notification Worker emails staff.
-5. The Sync-to-KB Lambda reads DynamoDB Streams and updates the product vectors in S3 whenever data changes.
-
-**AWS services used**
-
-| Service | Role |
-|---|---|
-| Amazon CloudFront | CDN routing static, SSR, and API traffic; a CloudFront Function strips `/api` |
-| Amazon S3 | Next.js static assets, part images, chatbot vector files |
-| AWS Lambda | Next.js SSR (Node.js 22), 5 microservices, 3 workers, 4 chatbot functions (Python 3.12) |
-| Amazon API Gateway | REST API for the website, WebSocket API for the chatbot |
-| Amazon Cognito | Sign-up, sign-in, Admins and Customers groups |
-| Amazon DynamoDB | Products, Orders, Carts, Users, chatbot sessions; on-demand mode |
-| Amazon EventBridge | Event bus for order events and staff handover requests |
-| Amazon SQS | 3 processing queues and 3 DLQs |
-| AWS Secrets Manager | VNPay and GHN keys, SMTP password, Gemini key (KMS-encrypted) |
-| Amazon CloudWatch, Amazon SNS | DLQ and error alarms, monitoring dashboard, email alerts |
-| AWS Budgets | Alert when monthly cost passes a threshold (10 USD by default) |
-| IAM, IAM Access Analyzer | Per-Lambda roles and automated permission review |
-
-**External services:** VNPay Sandbox (payments, HMAC-SHA512 signatures), Giao Hang Nhanh API v2 (shipping), Gmail SMTP (email), Google Gemini API (embeddings and language model).
-
-### 4. Technical Implementation
-
-**Technology**
-
-- *Frontend:* Next.js 16 (App Router, Server and Client Components, streaming SSR), Tailwind CSS v4, TypeScript, deployed with `@opennextjs/aws`.
-- *Backend:* Python 3.12 on Lambda, with REST routes scoped by role (Public, Customer, Admin).
-- *Chatbot:* Gemini `gemini-embedding-001` (768 dimensions) for embeddings, BM25 combined with cosine similarity, function calling for the `add_to_cart` and `request_human_agent` tools, and rate limits per session, connection, and day.
-- *Infrastructure:* Terraform manages every resource (about 3,600 lines of HCL, including 13 Lambda functions, 6 DynamoDB tables, 7 SQS queues, 4 secrets, and 6 CloudWatch alarms).
-- *CI/CD:* GitHub Actions with 3 independent workflows: `frontend.yml` (OpenNext build, S3 sync, SSR Lambda update, CloudFront invalidation), `backend.yml` (package and update the Python Lambdas), and `terraform.yml`.
-
-**Key technical mechanisms**
-
-- Atomic stock updates with a `ConditionExpression` so stock never goes negative.
-- VNPay signature verification with HMAC-SHA512 and idempotent IPN handling to avoid duplicate orders.
-- Every queue has a DLQ and a CloudWatch alarm when failed messages arrive.
-- Secrets moved from SSM Parameter Store to KMS-encrypted Secrets Manager; S3 buckets block public access and require HTTPS.
-- Offline tests for the chatbot and security tests for the microservices.
-
-### 5. Timeline and Milestones
-
-| Phase | Dates | Scope |
-|---|---|---|
-| Kickoff | 30/10/2026 | Next.js frontend, frontend Terraform infrastructure, and CI/CD |
-| Backend and event-driven | 30/10 – 10/11/2026 | 5 microservices, EventBridge, SQS with DLQs, 3 workers, VNPay, GHN, and Gmail SMTP integration |
-| Chatbot | 01/11 – 13/11/2026 | Bring the chatbot into Terraform, CDC sync from DynamoDB to S3 vectors, merge handover emails into the Notification Worker |
-| Security and monitoring | 10/11 – 16/11/2026 | Require sign-in at checkout, Cognito Authorizer for WebSocket, IAM Access Analyzer, move secrets to Secrets Manager |
-| Finalization | 17/11 – 14/12/2026 | End-to-end and load testing, cost tuning, demo preparation, and handover documentation |
-
-### 6. Budget Estimation
-
-The estimate uses a medium-scale monthly scenario: **30,000 page views, 300,000 API calls, 1,000 orders, and 10,000 chatbot questions**, in Singapore. The chatbot figures come from the team's AWS Pricing Calculator estimate ([estimate link](https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f)); the other services use AWS's published prices and should be confirmed in the Pricing Calculator before finalizing.
-
-| Service | Assumption | Estimate (USD/month) |
-|---|---|---|
-| Amazon CloudFront | About 60 GB and 1 million requests, within the free 1 TB and 10 million requests per month | 0.00 |
-| Amazon S3 | A few GB of static assets and images | 0.10 |
-| AWS Lambda (website) | About 0.4 million invocations and 70,000 GB-seconds, within the free 1 million invocations and 400,000 GB-seconds | 0.00 |
-| Amazon API Gateway REST | 300,000 requests at 3.50 USD per million | 1.05 |
-| Amazon DynamoDB | On-demand, about 600,000 reads and 50,000 writes | 0.20 |
-| Amazon SQS, EventBridge | A few thousand events, within the SQS free tier | 0.00 |
-| Amazon Cognito | Under 10,000 monthly active users (free) | 0.00 |
-| AWS Secrets Manager | 4 secrets at 0.40 USD each | 1.60 |
-| CloudWatch, SNS, Budgets | 6 alarms, 1 dashboard, small logs, within the free tier | 0.00 |
-| Chatbot on AWS | WebSocket, Lambda, DynamoDB, S3 at 10,000 questions (Pricing Calculator, before free tier) | 1.92 |
-| **AWS subtotal** | | **about 4.9** |
-| Google Gemini API (outside AWS) | Embeddings and answers for 10,000 questions at assumed ceiling prices | about 7.5 |
-| **Total** | | **about 12–13** |
-
-- Terraform already creates an AWS Budgets alert with a default threshold of **10 USD per month** for the AWS part. Gemini cost sits outside AWS and must be tracked separately with Google.
-- At low traffic almost every service stays within the free tier; the main fixed cost is Secrets Manager (1.60 USD).
-- Compared with OpenSearch Serverless for the chatbot (about 175–350 USD per month in fixed cost alone), the S3-based vector design saves most of the cost.
-
-### 7. Risk Assessment
-
-| Risk | Impact | Likelihood | Mitigation |
-|---|---|---|---|
-| Gemini overload or rate limits (429, 503, 504 errors) | Medium | Medium | Model fallback chain, fallback answers from local data, warm up Lambda before demos |
-| Cost overrun | Medium | Low | AWS Budgets, daily chatbot question cap, DynamoDB on-demand |
-| Order processing failures (GHN or SMTP errors) | High | Low | SQS with DLQs, CloudWatch alarms through SNS, redrive messages from DLQs |
-| Overselling under concurrent orders | High | Low | Conditional atomic stock updates in DynamoDB |
-| Leaked API keys or payment secrets | High | Low | KMS-encrypted Secrets Manager, least-privilege IAM, IAM Access Analyzer, no keys in the repo |
-| High latency for users in Vietnam | Low | Medium | CloudFront uses `PriceClass_100` (edges only in North America and Europe); move to `PriceClass_200` to use Asian edges |
-| Chatbot cold start (about 7 seconds) | Low | Medium | Right-sized Lambda memory, scheduled warm-up before peak hours |
-
-**Suggested improvement:** CI/CD currently uses IAM access keys stored in GitHub Secrets; switching to **OIDC with an IAM role** removes long-lived keys.
-
-### 8. Expected Outcomes
-
-- A fully working e-commerce site from browsing to payment, shipment, and email, running entirely serverless.
-- A chatbot that answers policy and product questions correctly, adds to the cart, and hands over to staff. Version v6 scored KB 6/6, products 12/12, and out-of-scope 4/4 in end-to-end testing, averaging about 2.5 seconds per question.
-- Infrastructure fully reproducible with Terraform, deployed automatically with GitHub Actions, with monitoring and cost alerts.
-- Running cost of about 12–13 USD per month at medium scale, close to zero at low traffic.
-- A base for future growth: more payment methods, more shipping carriers, or moving the chatbot to Amazon Bedrock when needed.
+### 9. Expected Results
+- *Technical improvements*: Successfully build a complete Serverless e-commerce system combined with real-time AI RAG, automatically scaling with load without anyone on duty to operate servers.
+- *Practical value*: Helps motorcycle parts stores reduce advisory staffing costs, lower the rate of customers buying wrong parts, and save as much budget as possible for the company/store owner.

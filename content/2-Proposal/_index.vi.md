@@ -1,158 +1,124 @@
 ---
 title: "Bản đề xuất"
-date: 2026-10-30
+date: 2026-11-06
 weight: 2
 chapter: false
 pre: " <b> 2. </b> "
 ---
 
-# Phụ Tùng Xe Máy Platform
-## Nền tảng thương mại điện tử phụ tùng xe máy trên AWS Serverless, tích hợp chatbot AI tư vấn
+# Motorcycle E-Commerce & RAG Chatbot Platform
+## Nền tảng bán phụ tùng xe máy Serverless và Chatbot tư vấn thông minh trên AWS
 
-Mã nguồn dự án: [github.com/lointt/phutungxemay-platform](https://github.com/lointt/phutungxemay-platform)
+### 1. Tổng quan bài toán
+Dự án được xây dựng nhằm giải quyết bài toán tư vấn và bán lẻ phụ tùng xe máy trực tuyến. Điểm khó nhất của ngành này là có quá nhiều mã linh kiện và đời xe khác nhau, khiến khách hàng rất dễ mua nhầm, còn cửa hàng thì tốn nhiều nhân lực trực chat. Hệ thống kết hợp giữa web bán hàng Next.js và Chatbot RAG (tư vấn tương thích phụ tùng thời gian thực qua WebSocket) trên nền tảng AWS Serverless 100%. Giải pháp giúp tự động hóa khâu tư vấn, xử lý đơn hàng bất đồng bộ, bảo mật cao và chi phí vận hành cực thấp.
 
-### 1. Tóm tắt điều hành
+### 2. Mục tiêu & phạm vi
+*Mục tiêu dự án*
+- **Tự động hóa tư vấn:** Xây dựng trợ lý ảo AI RAG tra cứu tương thích phụ tùng theo đúng dòng xe/đời xe theo thời gian thực (độ trễ phản hồi < 2s).
+- **Tối ưu chi phí & mở rộng:** Ứng dụng kiến trúc Serverless 100% trên AWS, loại bỏ hoàn toàn chi phí bảo trì máy chủ EC2, chi phí vận hành dưới **6 USD/tháng**.
+- **Bất đồng bộ hóa nghiệp vụ:** Áp dụng kiến trúc hướng sự kiện (EDA) để tách rời quy trình đặt hàng, trừ tồn kho, sinh vận đơn và thông báo email.
+*Phạm vi thực hiện (Scope)*
+- **Trong phạm vi (In-Scope):**
+  - Web ứng dụng thương mại điện tử Next.js 14 SSR và 5 microservices backend Lambda.
+  - Hệ thống xác thực khách hàng và phân quyền quản trị bằng Amazon Cognito JWT.
+  - Cụm Chatbot AI RAG qua WebSocket API Gateway (tích hợp Vector Store S3, Google Gemini 2.0 Flash) kèm cơ chế bàn giao nhân viên trực ca (Human Handover).
+  - Tích hợp cổng thanh toán trực tuyến VNPay Sandbox và giao vận Giao Hàng Nhanh (GHN) Sandbox.
+  - Quy trình xử lý sự kiện qua EventBridge, 3 hàng đợi SQS có DLQ và 3 worker nền (Inventory, Shipping, Notification).
+  - Tự động hóa hạ tầng (IaC) toàn diện bằng Terraform và CI/CD GitHub Actions.
+- **Ngoài phạm vi (Out-of-Scope):** Hệ thống máy POS bán lẻ tại cửa hàng offline và cổng thanh toán thẻ quốc tế (Stripe/PayPal).
 
-Phụ Tùng Xe Máy Platform là website bán phụ tùng xe máy chính hãng, cho phép khách hàng tìm phụ tùng theo dòng xe, đặt hàng, thanh toán qua VNPay hoặc COD, theo dõi vận đơn Giao Hàng Nhanh (GHN) và nhận email xác nhận. Website có chatbot AI tư vấn phụ tùng, trả lời chính sách cửa hàng, kiểm tra tồn kho, thêm vào giỏ hàng và chuyển cho nhân viên khi cần.
+### 3. Vấn đề cần giải quyết
+*Vấn đề hiện tại*
+- Khách hàng không rành kỹ thuật nên thường xuyên đặt sai linh kiện/phụ tùng (sai đời xe, sai kích thước bugi, nhông sên dĩa...), dẫn đến tỷ lệ đổi trả hàng cao.
+- Nhân viên mất nhiều thời gian trả lời lặp đi lặp lại các câu hỏi: xe này lắp vừa không, còn hàng không, giá bao nhiêu.
+- Thuê máy chủ cố định (EC2/VPS) tốn kém chi phí duy trì hàng tháng trong khi lượng truy cập không đều giữa ngày và đêm.
 
-Hệ thống được xây dựng **100% serverless trên AWS** tại vùng Singapore (`ap-southeast-1`): frontend Next.js 16 chạy trên AWS Lambda và Amazon CloudFront, 5 microservice Python sau Amazon API Gateway, xử lý đơn hàng bất đồng bộ bằng Amazon EventBridge và Amazon SQS, dữ liệu trên Amazon DynamoDB, đăng nhập bằng Amazon Cognito. Toàn bộ hạ tầng được quản lý bằng **Terraform** và triển khai tự động bằng **GitHub Actions**. Kiến trúc không có máy chủ chạy thường trực, nên chi phí tăng theo lượng truy cập thật và gần bằng 0 khi ít người dùng.
+*Giải pháp*
+- Xây dựng web bán hàng bằng Next.js 14 SSR và 5 microservices Lambda (Catalog, Cart, Order, User, Payment) qua API Gateway.
+- Tích hợp Chatbot AI RAG qua API Gateway WebSocket: tự động tìm kiếm linh kiện tương thích từ kho vector lưu trên S3 và trả lời khách ngay lập tức. Nếu gặp ca khó hoặc khiếu nại, bot tự chuyển tiếp thông tin (Human Requested) qua email cho nhân viên.
+- Áp dụng kiến trúc hướng sự kiện (EDA): dùng EventBridge và SQS để tách riêng việc trừ kho, sinh vận đơn giao hàng và gửi email xác nhận, có DLQ giúp hệ thống không bị nghẽn.
+- Thanh toán online an toàn qua cổng VNPay với xác thực chữ ký số HMAC-SHA512.
 
-### 2. Tuyên bố vấn đề
+*Lợi ích và hoàn vốn đầu tư (ROI)*
+- Giảm hơn 60% thời gian nhân viên phải trực chat trả lời câu hỏi cơ bản.
+- Giảm tỷ lệ mua nhầm phụ tùng xuống dưới 5% nhờ bot kiểm tra đúng đời xe trước khi khách đặt.
+- Chi phí hạ tầng cực thấp nhờ sử dụng kiến trúc serverless và cơ chế dùng bao nhiêu trả bấy nhiêu (Pay-as-you-go). Thời gian hoàn vốn dự kiến từ 3–6 tháng. 
 
-**Vấn đề hiện tại**
+### 4. Kiến trúc giải pháp
+Toàn bộ hệ thống chạy theo mô hình Serverless, không cần quản lý máy chủ vật lý. Người dùng truy cập web qua CloudFront CDN; các API gọi về API Gateway REST; tính năng chat realtime đi qua WebSocket; các tác vụ nền đẩy vào EventBridge và SQS.
 
-- Khách hàng khó tìm đúng phụ tùng cho dòng xe của mình; cửa hàng nhỏ thường tư vấn thủ công qua điện thoại hoặc tin nhắn.
-- Quy trình sau khi đặt hàng (trừ kho, tạo vận đơn, gửi email) làm bằng tay dễ sai sót, nhất là khi nhiều đơn đến cùng lúc có thể làm tồn kho bị âm.
-- Thuê máy chủ chạy 24/7 tốn chi phí cố định dù lượng truy cập của cửa hàng nhỏ không đều.
-- Chatbot AI dùng cơ sở dữ liệu vector chuyên dụng (ví dụ Amazon OpenSearch Serverless) có chi phí cố định hàng trăm USD mỗi tháng, không phù hợp quy mô cửa hàng.
+![Kiến trúc tổng thể hệ thống](/static/images/5-Workshop/5.1-Workshop-overview/AWS_Architecture.drawio.png)
 
-**Giải pháp**
+*Dịch vụ AWS sử dụng*
+- *Amazon CloudFront & Functions*: CDN phân phối web, chèn security headers và đóng vai trò Edge WAF chặn XSS, SQLi...
+- *AWS Lambda*: Gồm 13 hàm xử lý: Next.js SSR, 5 microservices backend (Catalog, Cart, Order, User, Payment), cụm Chatbot RAG (Chat Authorizer, Chat Receiver, Chat Orchestrator, DynamoDB Sync To S3) và 3 worker xử lý nền (Inventory, Shipping, Notification).
+- *Amazon API Gateway*: Cung cấp REST API cho web và WebSocket API cho chatbot realtime.
+- *Amazon DynamoDB*: Lưu trữ 6 bảng dữ liệu (Products, Orders, Carts, Users, StorePolicies, ChatbotSessions); bật Streams để tự động sync dữ liệu sang kho tri thức AI và kích hoạt sao lưu PITR.
+- *Amazon S3*: Lưu file web static, ảnh sản phẩm và file vector tri thức của Chatbot.
+- *Amazon EventBridge & SQS*: Điều phối sự kiện đơn hàng và hàng đợi tin nhắn có kèm Dead Letter Queue (DLQ).
+- *Amazon Cognito*: Quản lý đăng ký, đăng nhập và phân quyền khách hàng / admin bằng JWT.
+- *Amazon CloudWatch & SNS*: Giám sát hệ thống, cảnh báo lỗi qua email.
+- *Amazon CloudTrail*: Truy vết chỉnh sửa/thay đổi
+- *Amazon Secret Manager*: lưu trữ an toàn các secret key.
 
-- Website thương mại điện tử đầy đủ: danh mục phụ tùng có lọc theo dòng xe, giỏ hàng, đặt hàng, "Garage" lưu xe của khách, trang quản trị cho admin.
-- Backend tách thành microservice trên Lambda; các bước sau đặt hàng chạy bất đồng bộ qua EventBridge và SQS kèm hàng đợi lỗi (DLQ), nên một bước lỗi không làm hỏng cả đơn hàng.
-- Trừ kho nguyên tử bằng điều kiện `stock >= :qty` trên DynamoDB, chống tồn kho âm khi nhiều đơn đồng thời.
-- Chatbot RAG không dùng OpenSearch: vector lưu dạng file JSON trên S3, nạp vào bộ nhớ Lambda, tự cập nhật khi dữ liệu sản phẩm thay đổi nhờ DynamoDB Streams.
+*Thiết kế thành phần*
+- *Frontend*: S3 (ảnh, file tĩnh) và lambda Next.js SSR tải nhanh, hỗ trợ tìm kiếm và lọc phụ tùng theo hãng xe (Honda, Yamaha...).
+- *Backend Microservices*: Xử lý thêm giỏ hàng, đặt hàng, cập nhật tài khoản và webhook thanh toán VNPay.
+- *Chatbot RAG*: Tiếp nhận tin nhắn qua WebSocket, so khớp vector trên S3 để sinh câu trả lời tư vấn chính xác.
+- *Event Workers*: Lambda InventoryWorker (trừ kho), ShippingWorker (tạo đơn GHN), NotificationWorker (gửi gmail cho khách hàng/ nhân viên).
 
-**Lợi ích và giá trị mang lại**
+### 5. Triển khai kỹ thuật
+*Các giai đoạn triển khai*
+1. *Thiết kế kiến trúc & viết Terraform*: thiết kế kiến trúc serverless trên draw.io và viết code IaC để tự động hóa toàn bộ hạ tầng AWS (2 tuần).
+2. *Phát triển Core Web & Microservices*: Viết 5 Lambda backend bằng Python 3.12, dựng frontend Next.js và tích hợp thanh toán VNPay sandbox(2 tuần).
+3. *Tích hợp AI RAG & Hướng sự kiện*: Dựng kênh WebSocket, kết nối EventBridge sang SQS, viết các lambda worker xử lý nền và tích hợp thanh toán GHN sandbox (2 tuần).
+4. *Bảo mật, Kiểm thử & Đưa vào vận hành*: Vá các lỗ hổng bảo mật, thiết lập CloudWatch Alarms và chạy kiểm thử (2 tuần).
 
-- Khách tự tra cứu và mua phụ tùng 24/7; chatbot giảm số câu hỏi lặp lại mà nhân viên phải trả lời.
-- Đơn hàng được xử lý tự động từ thanh toán đến vận đơn và email, giảm thao tác thủ công.
-- Chi phí vận hành ước tính khoảng 12–13 USD mỗi tháng ở quy mô vừa (mục 6), trong đó phần lớn là chi phí mô hình AI; có cảnh báo ngân sách để kiểm soát.
-- Hạ tầng dạng mã (Terraform) giúp dựng lại toàn bộ môi trường nhanh chóng và nhất quán.
+*Yêu cầu kỹ thuật*
+- Sử dụng Terraform để quản lý hạ tầng đồng nhất, dễ triển khai lại khi cần.
+- Backend viết bằng Python 3.12 gọn nhẹ, khởi động nhanh (cold start thấp).
+- Áp dụng nguyên tắc Zero-Trust: kiểm tra quyền từ Cognito token, mã hóa dữ liệu tĩnh (SSE) và đường truyền (HTTPS/TLS).
 
-### 3. Kiến trúc giải pháp
+### 6. Kế hoạch & Timeline thực hiện
+- *Tuần 1, 2*: Chốt kiến trúc, dựng xong hạ tầng nền tảng bằng Terraform.
+- *Tuần 3, 4*: Hoàn thành backend microservices, web mua hàng và thanh toán VNPay sandbox.
+- *Tuần 5, 6*: Hoàn thành chatbot RAG tư vấn, cơ chế bàn giao nhân viên, hàng đợi sự kiện SQS và tích hợp thanh toán GHN sandbox.
+- *Tuần 7, 8*: Kiểm thử bảo mật, tối ưu chi phí và đưa vào sử dụng thực tế.
 
-![Kiến trúc Phụ Tùng Xe Máy Platform](/images/2-Proposal/phutungxemay_architecture.png)
+### 7. Ước tính chi phí
+Có thể xem chi phí trên [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=a7e8011b4c42dd57ec809519002009910500eb23)
+Hoặc xem [tệp ước tính ngân sách](/static/attachments/Cost_Estimate.csv).
+*Chi phí hạ tầng (Dự toán chi tiết theo bảng tính AWS cho quy mô 1.000 users/tháng):*
+- *AWS Secrets Manager*: 1,65 USD/tháng (Quản lý an toàn 4 secrets: Gemini Key, VNPay, GHN, Gmail SMTP; 10.000 lượt gọi API).
+- *Amazon CloudFront*: 1,32 USD/tháng (10 GB data transfer out, 50.000 HTTPS requests và bộ lọc Edge WAF).
+- *Amazon CloudWatch*: 1,30 USD/tháng (1 GB log data ingested, 6 metric alarms và 1 dashboard giám sát).
+- *Amazon DynamoDB*: 0,52 USD/tháng (gồm 0,29 USD dung lượng đọc/ghi on-demand và 0,23 USD sao lưu PITR bảo vệ 1 GB dữ liệu; Streams miễn phí 0 USD).
+- *Amazon API Gateway*: 0,23 USD/tháng (50.000 REST API requests và 20.000 WebSocket messages).
+- *S3 Standard*: 0,09 USD/tháng (3 GB lưu trữ ảnh & vector, 1.000 PUT requests và 15.000 GET requests).
+- *AWS Key Management Service (KMS)*: 0,03 USD/tháng (10.000 symmetric requests mã hóa khóa bí mật).
+- *AWS Lambda*: 0,00 USD/tháng (500.000 requests, 512 MB bộ nhớ - nằm trọn trong hạn mức 1 triệu requests Free Tier).
+- *Amazon Cognito*: 0,00 USD/tháng (1.000 người dùng hoạt động hàng tháng - MAU, miễn phí trong hạn mức 50.000 MAU Free Tier).
+- *Amazon Simple Queue Service (SQS)*: 0,00 USD/tháng (15.000 standard requests, miễn phí trong 1 triệu requests Free Tier).
+- *Amazon EventBridge*: 0,00 USD/tháng (3.000 custom events nằm trong hạn mức Free Tier).
+- *Amazon SNS*: 0,00 USD/tháng (100 requests cảnh báo email miễn phí).
+- *AWS CloudTrail*: 0,00 USD/tháng (Ghi vết lịch sử quản trị Event History trong 90 ngày miễn phí 100%).
+*Tổng chi phí*: **5,14 USD/tháng**, tương đương **61,68 USD/12 tháng** (khoảng **~1.540.000 VNĐ** cho cả năm vận hành).
 
-**Luồng truy cập website**
+### 8. Đánh giá rủi ro & phương án giảm thiểu
+*Ma trận rủi ro*
+- Lỗ hổng web / đánh cắp dữ liệu: Tác động cao, xác suất trung bình.
+- AI trả lời sai thông số phụ tùng: Tác động cao, xác suất thấp.
+- Chi phí tăng đột biến do bị spam gọi API: Tác động trung bình, xác suất thấp.
 
-1. Trình duyệt truy cập Amazon CloudFront. Đường dẫn `/_next/*` và ảnh sản phẩm lấy từ Amazon S3; các trang động được render (SSR) bởi Lambda chạy Next.js qua adapter OpenNext.
-2. Đường dẫn `/api/*` đi qua một CloudFront Function để bỏ tiền tố `/api`, rồi tới API Gateway REST có Cognito Authorizer.
-3. API Gateway gọi 5 microservice: Catalog, Cart, Order, Payment Webhook (VNPay IPN) và User Profile; dữ liệu nằm trong các bảng DynamoDB Products, Orders, Carts, Users.
+*Chiến lược giảm thiểu*
+- Chặn tấn công từ biên bằng Edge WAF, kiểm tra JWT token chống xem trộm đơn hàng của người khác (chống IDOR).
+- Ràng buộc prompt AI chặt chẽ: chỉ trả lời những gì có trong tài liệu kỹ thuật, không tự bịa thông số.
+- Đặt giới hạn tốc độ (rate limit) trên API Gateway và cài cảnh báo chi phí AWS Budgets.
 
-**Luồng xử lý đơn hàng (event-driven)**
+*Kế hoạch dự phòng*
+- Khi bot không xử lý được, tự động chuyển ca sang nhân viên hỗ trợ kèm thông tin khách hàng qua email.
+- Toàn bộ hạ tầng nằm trong file Terraform, có thể dựng lại hoàn chỉnh trên vùng khác trong 15 phút nếu có sự cố.
 
-1. Order Service và Payment Webhook phát sự kiện lên một EventBridge custom bus.
-2. Rule của EventBridge đẩy sự kiện vào 3 hàng đợi SQS, mỗi hàng đợi có DLQ riêng.
-3. Ba worker xử lý: Inventory Worker trừ hoặc hoàn kho, Shipping Worker tạo vận đơn GHN API v2 (chuẩn hóa địa chỉ Việt Nam bằng fuzzy match), Notification Worker gửi email hóa đơn HTML qua Gmail SMTP.
-
-**Luồng chatbot AI (RAG)**
-
-1. Khách chat qua API Gateway WebSocket, xác thực JWT Cognito bằng Lambda Authorizer.
-2. Lambda Chat Receiver nhận tin nhắn và gọi bất đồng bộ Lambda Chat Orchestrator (đóng gói dạng container image).
-3. Orchestrator tìm kiếm kết hợp embedding Gemini và BM25 trên vector trong S3, đọc tồn kho và giỏ hàng trong DynamoDB, rồi gọi Gemini để trả lời; có chế độ dự phòng khi Gemini quá tải.
-4. Khi khách cần người thật, Orchestrator phát sự kiện `HumanHandoverRequested` lên EventBridge để Notification Worker gửi email cho nhân viên.
-5. Lambda Sync-to-KB đọc DynamoDB Streams và cập nhật vector sản phẩm trên S3 mỗi khi dữ liệu thay đổi.
-
-**Các dịch vụ AWS sử dụng**
-
-| Dịch vụ | Vai trò |
-|---|---|
-| Amazon CloudFront | CDN, định tuyến tĩnh, SSR và API; CloudFront Function bỏ tiền tố `/api` |
-| Amazon S3 | Tài nguyên tĩnh của Next.js, ảnh phụ tùng, file vector của chatbot |
-| AWS Lambda | SSR Next.js (Node.js 22), 5 microservice, 3 worker, 4 hàm chatbot (Python 3.12) |
-| Amazon API Gateway | REST API cho website, WebSocket API cho chatbot |
-| Amazon Cognito | Đăng ký, đăng nhập, nhóm Admins và Customers |
-| Amazon DynamoDB | Products, Orders, Carts, Users, phiên chatbot; chế độ on-demand |
-| Amazon EventBridge | Event bus cho sự kiện đơn hàng và yêu cầu chuyển nhân viên |
-| Amazon SQS | 3 hàng đợi xử lý và 3 DLQ |
-| AWS Secrets Manager | Khóa VNPay, GHN, mật khẩu SMTP, khóa Gemini (mã hóa KMS) |
-| Amazon CloudWatch, Amazon SNS | Cảnh báo DLQ và lỗi, dashboard giám sát, gửi cảnh báo qua email |
-| AWS Budgets | Cảnh báo khi chi phí tháng vượt ngưỡng (mặc định 10 USD) |
-| IAM, IAM Access Analyzer | Phân quyền theo vai trò cho từng Lambda, rà soát quyền tự động |
-
-**Dịch vụ bên ngoài:** VNPay Sandbox (thanh toán, chữ ký HMAC-SHA512), Giao Hàng Nhanh API v2 (vận đơn), Gmail SMTP (email), Google Gemini API (embedding và mô hình ngôn ngữ).
-
-### 4. Triển khai kỹ thuật
-
-**Công nghệ**
-
-- *Frontend:* Next.js 16 (App Router, Server và Client Components, streaming SSR), Tailwind CSS v4, TypeScript, triển khai bằng `@opennextjs/aws`.
-- *Backend:* Python 3.12 trên Lambda, thiết kế REST rõ ràng theo vai trò (Public, Customer, Admin).
-- *Chatbot:* Gemini `gemini-embedding-001` (768 chiều) cho embedding, BM25 kết hợp cosine, function calling cho các công cụ `add_to_cart` và `request_human_agent`, giới hạn tần suất theo phiên, kết nối và ngày.
-- *Hạ tầng:* Terraform quản lý toàn bộ tài nguyên (khoảng 3.600 dòng HCL, gồm 13 hàm Lambda, 6 bảng DynamoDB, 7 hàng đợi SQS, 4 secret, 6 cảnh báo CloudWatch).
-- *CI/CD:* GitHub Actions với 3 workflow độc lập: `frontend.yml` (build OpenNext, đồng bộ S3, cập nhật Lambda SSR, xóa cache CloudFront), `backend.yml` (đóng gói và cập nhật các Lambda Python), `terraform.yml`.
-
-**Các cơ chế kỹ thuật chính**
-
-- Trừ kho nguyên tử bằng `ConditionExpression` để không bao giờ âm kho.
-- Xác thực chữ ký VNPay bằng HMAC-SHA512, xử lý IPN có idempotency để không ghi trùng đơn.
-- Mỗi hàng đợi có DLQ và cảnh báo CloudWatch khi có tin nhắn lỗi.
-- Secret được chuyển từ SSM Parameter Store sang Secrets Manager có mã hóa KMS; bucket S3 chặn truy cập công khai và bắt buộc HTTPS.
-- Bộ kiểm thử offline cho chatbot và kiểm thử bảo mật cho các microservice.
-
-### 5. Lộ trình và mốc triển khai
-
-| Giai đoạn | Thời gian | Nội dung |
-|---|---|---|
-| Khởi tạo | 30/10/2026 | Dựng frontend Next.js, hạ tầng Terraform cho frontend và CI/CD |
-| Backend và event-driven | 30/10 – 10/11/2026 | 5 microservice, EventBridge, SQS và DLQ, 3 worker, tích hợp VNPay, GHN, Gmail SMTP |
-| Chatbot | 01/11 – 13/11/2026 | Đưa chatbot vào Terraform, đồng bộ CDC từ DynamoDB sang vector S3, gộp email chuyển nhân viên vào Notification Worker |
-| Bảo mật và giám sát | 10/11 – 16/11/2026 | Bắt buộc đăng nhập khi thanh toán, Cognito Authorizer cho WebSocket, IAM Access Analyzer, chuyển secret sang Secrets Manager |
-| Hoàn thiện | 17/11 – 14/12/2026 | Kiểm thử đầu cuối, kiểm thử tải, tối ưu chi phí, chuẩn bị demo và tài liệu bàn giao |
-
-### 6. Ước tính ngân sách
-
-Dự toán theo kịch bản quy mô vừa mỗi tháng: **30.000 lượt xem trang, 300.000 lượt gọi API, 1.000 đơn hàng, 10.000 câu hỏi chatbot**, vùng Singapore. Phần chatbot dùng số liệu từ bản ước tính trên AWS Pricing Calculator của nhóm ([link ước tính](https://calculator.aws/#/estimate?id=d87e34b9f9a1e9f419182c4da7f6281aa720795f)); các dịch vụ còn lại tính theo bảng giá công bố của AWS và cần được xác nhận lại trên Pricing Calculator trước khi chốt.
-
-| Dịch vụ | Giả định | Ước tính (USD/tháng) |
-|---|---|---|
-| Amazon CloudFront | Khoảng 60 GB và 1 triệu request, nằm trong mức miễn phí 1 TB và 10 triệu request mỗi tháng | 0,00 |
-| Amazon S3 | Vài GB tài nguyên tĩnh và ảnh | 0,10 |
-| AWS Lambda (website) | Khoảng 0,4 triệu lượt gọi, 70.000 GB-giây, trong mức miễn phí 1 triệu lượt và 400.000 GB-giây | 0,00 |
-| Amazon API Gateway REST | 300.000 request, 3,50 USD mỗi triệu request | 1,05 |
-| Amazon DynamoDB | On-demand, khoảng 600.000 lượt đọc và 50.000 lượt ghi | 0,20 |
-| Amazon SQS, EventBridge | Vài nghìn sự kiện, trong mức miễn phí của SQS | 0,00 |
-| Amazon Cognito | Dưới 10.000 người dùng hoạt động mỗi tháng (miễn phí) | 0,00 |
-| AWS Secrets Manager | 4 secret, 0,40 USD mỗi secret | 1,60 |
-| CloudWatch, SNS, Budgets | 6 cảnh báo, 1 dashboard, log nhỏ, trong mức miễn phí | 0,00 |
-| Chatbot trên AWS | WebSocket, Lambda, DynamoDB, S3 ở 10.000 câu hỏi (theo Pricing Calculator, chưa tính mức miễn phí) | 1,92 |
-| **Tổng phần AWS** | | **khoảng 4,9** |
-| Google Gemini API (ngoài AWS) | Embedding và sinh câu trả lời cho 10.000 câu hỏi, theo giá trần giả định | khoảng 7,5 |
-| **Tổng cộng** | | **khoảng 12–13** |
-
-- Terraform đã tạo AWS Budgets với ngưỡng mặc định **10 USD mỗi tháng** cho phần AWS. Chi phí Gemini nằm ngoài AWS nên cần theo dõi riêng trên Google.
-- Khi lượng truy cập thấp, gần như mọi dịch vụ nằm trong mức miễn phí; chi phí cố định chủ yếu là Secrets Manager (1,60 USD).
-- So với phương án dùng OpenSearch Serverless cho chatbot (khoảng 175–350 USD mỗi tháng chỉ riêng chi phí cố định), kiến trúc vector trên S3 tiết kiệm phần lớn chi phí.
-
-### 7. Đánh giá rủi ro
-
-| Rủi ro | Ảnh hưởng | Xác suất | Cách giảm thiểu |
-|---|---|---|---|
-| Gemini quá tải hoặc giới hạn tần suất (lỗi 429, 503, 504) | Trung bình | Trung bình | Chuỗi mô hình dự phòng, chế độ trả lời dự phòng từ dữ liệu có sẵn, làm nóng Lambda trước demo |
-| Chi phí vượt dự kiến | Trung bình | Thấp | AWS Budgets, giới hạn số câu hỏi chatbot mỗi ngày, DynamoDB on-demand |
-| Xử lý đơn thất bại (GHN, SMTP lỗi) | Cao | Thấp | SQS có DLQ, cảnh báo CloudWatch qua SNS, xử lý lại tin nhắn từ DLQ |
-| Bán vượt tồn kho khi nhiều đơn đồng thời | Cao | Thấp | Trừ kho nguyên tử có điều kiện trên DynamoDB |
-| Lộ khóa API hoặc thông tin thanh toán | Cao | Thấp | Secrets Manager mã hóa KMS, IAM tối thiểu, IAM Access Analyzer, không lưu khóa trong repo |
-| Độ trễ cao với khách ở Việt Nam | Thấp | Trung bình | CloudFront đang dùng `PriceClass_100` (chỉ edge ở Bắc Mỹ và châu Âu); có thể nâng lên `PriceClass_200` để dùng edge ở châu Á |
-| Cold start của chatbot (khoảng 7 giây) | Thấp | Trung bình | Bộ nhớ Lambda phù hợp, làm nóng định kỳ trước giờ cao điểm |
-
-**Đề xuất cải tiến:** CI/CD hiện dùng access key IAM lưu trong GitHub Secrets; nên chuyển sang **OIDC với IAM role** để không còn khóa dài hạn.
-
-### 8. Kết quả kỳ vọng
-
-- Website thương mại điện tử hoạt động đầy đủ từ xem sản phẩm đến thanh toán, vận đơn và email, chạy hoàn toàn serverless.
-- Chatbot trả lời đúng chính sách và sản phẩm, thêm được vào giỏ hàng và chuyển nhân viên. Bản v6 đã đạt KB 6/6, sản phẩm 12/12, ngoài phạm vi 4/4 trong kiểm thử đầu cuối, thời gian trung bình khoảng 2,5 giây mỗi câu.
-- Hạ tầng dựng lại được hoàn toàn bằng Terraform, triển khai tự động bằng GitHub Actions, có giám sát và cảnh báo chi phí.
-- Chi phí vận hành khoảng 12–13 USD mỗi tháng ở quy mô vừa, gần 0 khi ít truy cập.
-- Nền tảng làm cơ sở để mở rộng: thêm phương thức thanh toán, nhiều đơn vị vận chuyển, hoặc chuyển chatbot sang Amazon Bedrock khi cần.
+### 9. Kết quả kỳ vọng
+- *Cải tiến kỹ thuật*: Xây dựng thành công hệ thống thương mại điện tử Serverless hoàn chỉnh kết hợp AI RAG thời gian thực, tự động mở rộng theo tải mà không cần trực vận hành máy chủ.
+- *Giá trị thực tế*: Giúp cửa hàng phụ tùng xe máy giảm chi phí nhân sự tư vấn, giảm tỷ lệ khách mua nhầm phụ tùng và tiết kiệm tối đa ngân sách cho công ty/ chủ cửa hàng.
