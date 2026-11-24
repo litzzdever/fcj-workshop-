@@ -1,6 +1,6 @@
 ---
 title: "Internship Report"
-date: 2024-01-01
+date: 2026-09-15
 weight: 1
 chapter: false
 ---
@@ -9,15 +9,15 @@ chapter: false
 # Internship Report
 
 ### Student Information:
-&emsp; **Full Name:** Nguyen Van A
+&emsp; **Full Name:** Lieu Ich Thanh
 
-&emsp; **Phone Number:** 0989888999 
+&emsp; **Phone Number:** 0797422279 
 
-&emsp; **Email:** Anguyenvan@gmail.com
+&emsp; **Email:** ichthanh8899@gmail.com
 
-&emsp; **University:** Ho Chi Minh City University of Technology and Education
+&emsp; **University:** FPT University
 
-&emsp; **Major:** Information Technology
+&emsp; **Major:** Artificial Intelligence
 
 &emsp; **Class:** AWS082025
 
@@ -25,9 +25,9 @@ chapter: false
 
 &emsp; **Internship Position:** Workforce Bootcamp - First Cloud AI Journey
 
-&emsp; **Internship Duration:** From 12/08/2025 to 12/11/2025
+&emsp; **Internship Duration:** From 15/09/2026 to 14/12/2026
 
-![Your profile picture](/images/avatar.png)
+![Profile picture of Lieu Ich Thanh](/images/avatar.jpg)
 
 ### Report Content
 
